@@ -12,7 +12,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
-    "build:vercel": "prisma generate && if [ \"$VERCEL_ENV\" = \"production\" ]; then DATABASE_URL=\"$DATABASE_URL_UNPOOLED\" prisma migrate deploy; fi"
+    "build:vercel": "node scripts/vercel-build.cjs"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

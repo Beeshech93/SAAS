@@ -9,6 +9,14 @@ describe('normalizeDatabaseUrl', () => {
     expect(u.searchParams.get('connection_limit')).toBe('1');
     expect(u.searchParams.get('sslmode')).toBe('require');
   });
+  it('puts the app in its own PostgreSQL schema when asked (shared databases stay untouched)', () => {
+    const u = new URL(normalizeDatabaseUrl('postgresql://u:p@ep-x-pooler.neon.tech/neondb?sslmode=require&schema=public', 'wba')!);
+    expect(u.searchParams.get('schema')).toBe('wba');
+    expect(u.searchParams.get('pgbouncer')).toBe('true');
+    expect(u.searchParams.get('sslmode')).toBe('require');
+    expect(new URL(normalizeDatabaseUrl('postgresql://wba:pw@localhost:5432/wba', 'wba')!).searchParams.get('schema')).toBe('wba');
+    expect(normalizeDatabaseUrl('postgresql://u:p@localhost/db?schema=public')).toBe('postgresql://u:p@localhost/db?schema=public');
+  });
   it('keeps explicit settings and leaves non-pooled/local URLs untouched', () => {
     const keep = new URL(normalizeDatabaseUrl('postgresql://u:p@x-pooler.neon.tech/db?pgbouncer=false&connection_limit=5')!);
     expect(keep.searchParams.get('pgbouncer')).toBe('false');
