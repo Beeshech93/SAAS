@@ -78,12 +78,12 @@ export default function WhatsAppPage() {
 
       {isOwner && i?.provider === 'EVOLUTION' && i.status === 'ACTIVE' && <QrConnect />}
 
-      {state.webhookUrl && (
+      {state.webhookUrl && (i || activeProvider === 'CLOUD_API') && (
       <div className="mt-4 rounded-xl border border-slate-200 bg-white p-5">
         <h2 className="font-semibold">{t('whatsapp.webhookTitle')}</h2>
         <code className="mt-2 block break-all rounded bg-slate-100 px-3 py-2 text-xs">{state.webhookUrl}</code>
         <p className="mt-2 text-xs text-slate-500">{i?.provider === 'EVOLUTION' ? t('whatsapp.evoWebhookHelp') : t('whatsapp.webhookHelp')}</p>
-        {!state.webhookConfigured && <p role="alert" className="mt-2 rounded bg-amber-50 px-3 py-2 text-xs text-amber-800">{t('whatsapp.webhookMissing')}</p>}
+        {!state.webhookConfigured && i?.provider !== 'EVOLUTION' && <p role="alert" className="mt-2 rounded bg-amber-50 px-3 py-2 text-xs text-amber-800">{t('whatsapp.webhookMissing')}</p>}
       </div>
       )}
 
