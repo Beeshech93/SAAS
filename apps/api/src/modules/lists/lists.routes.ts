@@ -15,9 +15,15 @@ const membersSchema = z
     customerIds: z.array(z.string().uuid()).max(500).default([]),
     // Pasted numbers: unknown ones become new customers.
     contacts: z.array(z.object({ phone: z.string().trim().min(1).max(40), name: z.string().trim().max(100).optional() }).strict()).max(500).default([]),
+    // Segment sources: copy customers that already exist in the business.
+    fromAll: z.boolean().optional(),
+    recentDays: z.number().int().min(1).max(365).optional(),
+    fromListId: z.string().uuid().optional(),
   })
   .strict()
-  .refine((b) => b.customerIds.length + b.contacts.length > 0, { message: 'Nothing to add' });
+  .refine((b) => b.customerIds.length + b.contacts.length > 0 || b.fromAll || b.recentDays || b.fromListId, { message: 'Nothing to add' });
+
+const SEGMENT_LIMIT = 5000;
 
 export const listsRouter = Router();
 listsRouter.use(authenticate, requireRole('OWNER', 'ADMIN'));
@@ -96,9 +102,18 @@ listsRouter.post('/:id/members', validateBody(membersSchema), async (req, res, n
   try {
     const businessId = req.auth!.businessId;
     const list = await loadList(businessId, req.params.id);
-    const { customerIds, contacts } = req.body as z.infer<typeof membersSchema>;
+    const { customerIds, contacts, fromAll, recentDays, fromListId } = req.body as z.infer<typeof membersSchema>;
 
     const wanted = new Set<string>();
+    if (fromAll) (await prisma.customer.findMany({ where: { businessId }, take: SEGMENT_LIMIT })).forEach((c) => wanted.add(c.id));
+    if (recentDays) {
+      const since = new Date(Date.now() - recentDays * 86400_000);
+      (await prisma.conversation.findMany({ where: { businessId, lastMessageAt: { gte: since } }, take: SEGMENT_LIMIT })).forEach((c) => wanted.add(c.customerId));
+    }
+    if (fromListId) {
+      const source = await loadList(businessId, fromListId); // only the business's own lists
+      (await prisma.customerListMember.findMany({ where: { listId: source.id }, take: SEGMENT_LIMIT })).forEach((m) => wanted.add(m.customerId));
+    }
     if (customerIds.length) {
       const own = await prisma.customer.findMany({ where: { businessId, id: { in: customerIds } } });
       own.forEach((c) => wanted.add(c.id)); // ids of other tenants are silently dropped

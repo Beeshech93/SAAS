@@ -94,3 +94,43 @@ describe('campaigns aimed at a list', () => {
     expect((await request(app).delete(`/api/lists/${l.id}`).set(auth(o.token))).status).toBe(200);
   });
 });
+
+describe('import a list from existing customers', () => {
+  async function seed(tag: string) {
+    const o = await registerUser(`li-${tag}`);
+    const cs = [] as any[];
+    for (const phone of ['+50937200001', '+50937200002', '+50937200003']) cs.push((await request(app).post('/api/customers').set(auth(o.token)).send({ phone })).body.data);
+    return { o, cs };
+  }
+  const members = async (tok: string, id: string) => (await request(app).get(`/api/lists/${id}`).set(auth(tok))).body.data.members.map((m: any) => m.phone).sort();
+
+  it('copies everyone, only recent conversations, or another list', async () => {
+    const { o, cs } = await seed('src');
+    const all = (await mkList(o.token, 'Tous')).body.data;
+    expect((await request(app).post(`/api/lists/${all.id}/members`).set(auth(o.token)).send({ fromAll: true })).body.data.added).toBe(3);
+
+    // Only cs[0] talked recently; cs[1] last talked 40 days ago; cs[2] never.
+    await request(app).post('/api/conversations').set(auth(o.token)).send({ customerId: cs[0].id });
+    const old = (await request(app).post('/api/conversations').set(auth(o.token)).send({ customerId: cs[1].id })).body.data;
+    fakePrisma.conversation.rows.find((c: any) => c.id === old.id).lastMessageAt = new Date(Date.now() - 40 * 86400_000);
+    const recent = (await mkList(o.token, 'Recents')).body.data;
+    await request(app).post(`/api/lists/${recent.id}/members`).set(auth(o.token)).send({ recentDays: 30 });
+    expect(await members(o.token, recent.id)).toEqual(['+50937200001']);
+
+    const copy = (await mkList(o.token, 'Copie')).body.data;
+    const r = await request(app).post(`/api/lists/${copy.id}/members`).set(auth(o.token)).send({ fromListId: recent.id });
+    expect(r.body.data.added).toBe(1);
+    expect(await members(o.token, copy.id)).toEqual(['+50937200001']);
+    // Repeating adds nothing new.
+    expect((await request(app).post(`/api/lists/${copy.id}/members`).set(auth(o.token)).send({ fromAll: true })).body.data).toMatchObject({ added: 2, alreadyIn: 1 });
+  });
+
+  it('refuses another tenant’s list as a source and an empty request', async () => {
+    const { o } = await seed('guard');
+    const other = await registerUser('li-guard-other');
+    const foreign = (await mkList(other.token, 'Etranger')).body.data;
+    const mine = (await mkList(o.token, 'Mienne')).body.data;
+    expect((await request(app).post(`/api/lists/${mine.id}/members`).set(auth(o.token)).send({ fromListId: foreign.id })).status).toBe(404);
+    expect((await request(app).post(`/api/lists/${mine.id}/members`).set(auth(o.token)).send({})).status).toBe(400);
+  });
+});

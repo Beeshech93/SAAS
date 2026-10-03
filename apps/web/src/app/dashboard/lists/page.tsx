@@ -5,11 +5,11 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { errorMessage, useList } from '@/lib/use-resource';
 import { Button, ErrorAlert, Field, Spinner } from '@/components/ui';
+import { ListImport, type AddResult } from '@/components/list-import';
 import { t } from '@/i18n';
 
 interface ListRow { id: string; name: string; memberCount: number }
 interface Customer { id: string; name: string | null; phone: string }
-interface AddResult { added: number; alreadyIn: number; created: number; invalid: string[]; invalidCount: number }
 
 export default function ListsPage() {
   const { me } = useAuth();
@@ -70,6 +70,7 @@ function ListDetail({ id, onBack }: { id: string; onBack: () => void }) {
   const [result, setResult] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const { items: allLists } = useList<{ id: string; name: string }>('/api/lists');
 
   const load = useCallback(async () => {
     try {
@@ -79,27 +80,14 @@ function ListDetail({ id, onBack }: { id: string; onBack: () => void }) {
   }, [id]);
   useEffect(() => { void load(); }, [load]);
 
-  async function add(body: { contacts?: { phone: string; name?: string }[]; customerIds?: string[] }) {
+  async function add(body: { customerIds?: string[] }) {
     setBusy(true); setErr(null); setResult(null);
-    try {
-      const r = await api<AddResult>(`/api/lists/${id}/members`, { method: 'POST', body });
-      setResult(t('lists.result', { added: String(r.added), already: String(r.alreadyIn), created: String(r.created), invalid: String(r.invalidCount) }) + (r.invalid.length ? ` ${t('lists.invalidList', { list: r.invalid.join(', ') })}` : ''));
-      setPicked(new Set());
-      await load();
-    } catch (e) { setErr(errorMessage(e)); }
+    try { finish(await api<AddResult>(`/api/lists/${id}/members`, { method: 'POST', body })); setPicked(new Set()); await load(); }
+    catch (e) { setErr(errorMessage(e)); }
     setBusy(false);
   }
-
-  function onPaste(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const text = String(new FormData(form).get('paste') ?? '');
-    const contacts = text.split('\n').map((l) => l.trim()).filter(Boolean).map((line) => {
-      const [phone, ...rest] = line.split(/[,;\t]/);
-      const name = rest.join(' ').trim();
-      return { phone: phone!.trim(), ...(name ? { name } : {}) };
-    }).slice(0, 500);
-    if (contacts.length) void add({ contacts }).then(() => form.reset());
+  function finish(r: AddResult) {
+    setResult(t('lists.result', { added: String(r.added), already: String(r.alreadyIn), created: String(r.created), invalid: String(r.invalidCount) }) + (r.invalid.length ? ` ${t('lists.invalidList', { list: r.invalid.join(', ') })}` : ''));
   }
 
   async function rename() {
@@ -132,12 +120,9 @@ function ListDetail({ id, onBack }: { id: string; onBack: () => void }) {
       <ErrorAlert message={err} />
       {result && <p role="status" className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{result}</p>}
 
-      <form onSubmit={onPaste} className="mt-4 space-y-2 rounded-xl border border-slate-200 bg-white p-5">
-        <label htmlFor="paste" className="block text-sm font-medium">{t('lists.addPaste')}</label>
-        <textarea id="paste" name="paste" rows={4} disabled={busy} placeholder="+50937001234, Jean" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-        <p className="text-xs text-slate-500">{t('lists.pasteHint')}</p>
-        <Button type="submit" disabled={busy}>{t('lists.pasteAdd')}</Button>
-      </form>
+      <ListImport currentListId={id} otherLists={allLists ?? []}
+        post={(body) => api<AddResult>(`/api/lists/${id}/members`, { method: 'POST', body })}
+        onFinished={async (total) => { setResult(null); finish(total); await load(); }} />
 
       {candidates.length > 0 && (
         <div className="mt-4 rounded-xl border border-slate-200 bg-white p-5">
