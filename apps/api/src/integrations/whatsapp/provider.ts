@@ -95,8 +95,8 @@ export class CloudApiProvider implements WhatsAppProvider {
 export class EvolutionApiProvider implements WhatsAppProvider {
   constructor(private readonly creds: { baseUrl: string; instanceName: string; apiKey: string }) {}
 
-  private async request(method: 'GET' | 'POST', path: string, body?: Record<string, unknown>): Promise<any> {
-    const url = `${this.creds.baseUrl}${path}/${encodeURIComponent(this.creds.instanceName)}`;
+  private async request(method: 'GET' | 'POST', path: string, body?: Record<string, unknown>, perInstance = true): Promise<any> {
+    const url = `${this.creds.baseUrl}${path}${perInstance ? `/${encodeURIComponent(this.creds.instanceName)}` : ''}`;
     let res: Response;
     try {
       res = await fetch(url, {
@@ -150,6 +150,28 @@ export class EvolutionApiProvider implements WhatsAppProvider {
   async connectionState(): Promise<string> {
     const json = await this.request('GET', '/instance/connectionState');
     return String(json?.instance?.state ?? json?.state ?? 'unknown');
+  }
+
+  /**
+   * Creates the instance (WhatsApp Web session) on the server. `apiKey` must then be the server's
+   * global key; the instance's own key is returned so only that, narrower key needs to be stored.
+   */
+  async createInstance(): Promise<{ instanceApiKey: string | null }> {
+    const json = await this.request('POST', '/instance/create', { instanceName: this.creds.instanceName, qrcode: true, integration: 'WHATSAPP-BAILEYS' }, false);
+    const hash = json?.hash;
+    const key = typeof hash === 'string' ? hash : hash?.apikey;
+    return { instanceApiKey: typeof key === 'string' && key ? key : null };
+  }
+
+  /** Current QR to scan (a PNG data URL), or none when the session is already connected. */
+  async connect(): Promise<{ state: string; qr: string | null; pairingCode: string | null }> {
+    const state = await this.connectionState();
+    if (state === 'open') return { state, qr: null, pairingCode: null };
+    const json = await this.request('GET', '/instance/connect');
+    const raw: unknown = json?.base64 ?? json?.qrcode?.base64;
+    const qr = typeof raw === 'string' && raw ? (raw.startsWith('data:image/') ? raw : `data:image/png;base64,${raw}`) : null;
+    const pairing = json?.pairingCode ?? json?.qrcode?.pairingCode;
+    return { state, qr, pairingCode: typeof pairing === 'string' && pairing ? pairing : null };
   }
 
   /** Points the instance's webhook at us (Evolution v2 payload), for incoming messages only. */

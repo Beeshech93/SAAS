@@ -13,10 +13,14 @@ const BASE = 'https://evo.example.com';
 
 let calls: { url: string; method: string; body: any; apikey: string }[] = [];
 const realFetch = global.fetch;
+let sessionState = 'open';
 function mockEvolution(overrides: { state?: number } = {}) {
+  sessionState = 'open';
   global.fetch = jest.fn(async (url: any, init: any) => {
     calls.push({ url: String(url), method: init?.method, body: init?.body ? JSON.parse(init.body) : undefined, apikey: init?.headers?.apikey });
-    if (String(url).includes('/instance/connectionState')) return new Response(JSON.stringify({ instance: { state: 'open' } }), { status: overrides.state ?? 200 });
+    if (String(url).includes('/instance/connectionState')) return new Response(JSON.stringify({ instance: { state: sessionState } }), { status: overrides.state ?? 200 });
+    if (String(url).includes('/instance/create')) return new Response(JSON.stringify({ instance: { instanceName: 'x' }, hash: 'instance-own-key-999' }), { status: 201 });
+    if (String(url).includes('/instance/connect/')) return new Response(JSON.stringify({ base64: 'data:image/png;base64,QRDATA', pairingCode: 'ABCD-1234', count: 1 }), { status: 200 });
     if (String(url).includes('/webhook/set')) return new Response('{}', { status: 201 });
     return new Response(JSON.stringify({ key: { id: 'EVO-OUT-1' } }), { status: 201 });
   }) as any;
@@ -113,5 +117,36 @@ describe('Evolution webhook', () => {
     const send = calls.find((c) => c.url.includes('/message/sendText/inst-ai'))!;
     expect(send.body).toEqual({ number: '50937002222', text: 'Oui, nous avons une chambre.' });
     expect(send.apikey).toBe('evo-key-123456');
+  });
+});
+
+describe('QR code connection', () => {
+  it('creates the instance with the global key and stores only the instance key', async () => {
+    const owner = await registerUser('evo-create');
+    const res = await request(app).put('/api/whatsapp').set(auth(owner.token)).send({ provider: 'EVOLUTION', baseUrl: BASE, instanceName: 'fresh', apiKey: 'global-admin-key-1', createInstance: true });
+    expect(res.status).toBe(200);
+    const create = calls.find((c) => c.url.endsWith('/instance/create'))!;
+    expect(create.apikey).toBe('global-admin-key-1');
+    expect(create.body).toMatchObject({ instanceName: 'fresh', qrcode: true });
+    const row = fakePrisma.whatsAppIntegration.rows.find((r: any) => r.instanceName === 'fresh')!;
+    expect(decrypt(row.accessTokenEnc)).toBe('instance-own-key-999');
+    expect(calls.find((c) => c.url.includes('/webhook/set/fresh'))!.apikey).toBe('instance-own-key-999');
+    expect(JSON.stringify(res.body)).not.toContain('global-admin-key');
+  });
+  it('returns the QR (no-store) while disconnected, nothing once connected', async () => {
+    const { owner } = await connect('qr', 'qrinst');
+    sessionState = 'connecting';
+    const qr = await request(app).post('/api/whatsapp/qr').set(auth(owner.token));
+    expect(qr.status).toBe(200);
+    expect(qr.body.data).toEqual({ state: 'connecting', qr: 'data:image/png;base64,QRDATA', pairingCode: 'ABCD-1234' });
+    expect(qr.headers['cache-control']).toBe('no-store');
+    expect((await request(app).get('/api/whatsapp/status').set(auth(owner.token))).body.data.state).toBe('connecting');
+    sessionState = 'open';
+    expect((await request(app).post('/api/whatsapp/qr').set(auth(owner.token))).body.data).toEqual({ state: 'open', qr: null, pairingCode: null });
+  });
+  it('needs a login and an Evolution connection', async () => {
+    expect((await request(app).post('/api/whatsapp/qr')).status).toBe(401);
+    const owner = await registerUser('evo-none');
+    expect((await request(app).post('/api/whatsapp/qr').set(auth(owner.token))).status).toBe(409);
   });
 });

@@ -58,6 +58,7 @@ Serverless caveats: rate limits and the AI per-conversation cap are in memory pe
 In **Dashboard → WhatsApp** choose "Evolution API" and enter the server URL (https, public), the instance name and the instance `apikey`.
 On save the API checks `/instance/connectionState`, then registers its own webhook in Evolution (`/webhook/set`, event `MESSAGES_UPSERT`):
 `<APP_URL>/api/webhooks/evolution/<integrationId>/<secret>` (the secret is generated per connection and is only shown to the owner).
+**QR code**: once saved, the WhatsApp page shows "Connexion par QR code" (owner only): it requests the QR from Evolution (`/instance/connect`), renews it every ~25 s and detects when the phone has scanned it. Tick "Créer l'instance" to create it on the server first (then enter the server's *global* apikey; only the instance's own key is stored).
 Targets Evolution API **v2**. Limits: text/media only (no templates), incoming media is stored as a placeholder (no download), group chats and `@lid` senders are ignored.
 Needs `ENCRYPTION_KEY` (stores the apikey encrypted). No new environment variables. Migration: `20261003000000_evolution`.
 

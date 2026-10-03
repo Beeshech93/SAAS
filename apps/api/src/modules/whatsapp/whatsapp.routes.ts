@@ -31,6 +31,8 @@ const evolutionSchema = z
     instanceName: z.string().trim().regex(/^[\w.-]{1,100}$/, 'Letters, digits, . _ - only'),
     // Optional when re-saving an existing Evolution connection (the stored key is kept).
     apiKey: z.string().trim().min(8).max(500).optional(),
+    // Create the instance on the server first (apiKey is then the server's global key).
+    createInstance: z.boolean().default(false),
     displayPhoneNumber,
     status,
   })
@@ -117,6 +119,17 @@ whatsappRouter.put('/', requireRole('OWNER'), validateBody(upsertSchema), async 
       const apiKey = body.apiKey ?? (keeping ? decrypt(existing!.accessTokenEnc) : undefined);
       if (!apiKey) throw new AppError(400, 'VALIDATION_ERROR', 'Invalid request', { apiKey: ['Required'] });
 
+      let apiKeyToStore = apiKey;
+      if (body.createInstance) {
+        try {
+          const created = await new EvolutionApiProvider({ baseUrl, instanceName: body.instanceName, apiKey }).createInstance();
+          if (created.instanceApiKey) apiKeyToStore = created.instanceApiKey; // keep only the narrower per-instance key
+        } catch (err) {
+          const message = err instanceof WhatsAppProviderError ? err.message : 'unknown error';
+          throw new AppError(502, 'INTERNAL_ERROR', `Could not create the instance: ${message}`);
+        }
+      }
+
       // A key not yet in the database can never receive traffic, so the secret exists before the URL is shown.
       const webhookSecret = (keeping && existing!.webhookSecret) || crypto.randomBytes(24).toString('base64url');
       const host = new URL(baseUrl).host;
@@ -125,7 +138,7 @@ whatsappRouter.put('/', requireRole('OWNER'), validateBody(upsertSchema), async 
         provider: 'EVOLUTION',
         phoneNumberId,
         displayPhoneNumber: body.displayPhoneNumber ?? null,
-        accessTokenEnc: encrypt(apiKey),
+        accessTokenEnc: encrypt(apiKeyToStore),
         status: body.status,
         baseUrl,
         instanceName: body.instanceName,
@@ -168,6 +181,42 @@ whatsappRouter.delete('/', requireRole('OWNER'), async (req, res, next) => {
     await prisma.whatsAppIntegration.deleteMany({ where: { businessId: req.auth!.businessId } });
     logger.info({ event: 'whatsapp_integration_removed', businessId: req.auth!.businessId, userId: req.auth!.userId }, 'WhatsApp integration removed');
     res.json({ success: true, data: view(null) });
+  } catch (e) {
+    next(e);
+  }
+});
+
+async function evolutionOf(businessId: string) {
+  const i = await prisma.whatsAppIntegration.findFirst({ where: { businessId, provider: 'EVOLUTION' } });
+  if (!i?.baseUrl || !i.instanceName) throw new AppError(409, 'CONFLICT', 'Evolution API is not configured');
+  return new EvolutionApiProvider({ baseUrl: i.baseUrl, instanceName: i.instanceName, apiKey: decrypt(i.accessTokenEnc) });
+}
+
+const noStore = (res: import('express').Response) => res.setHeader('Cache-Control', 'no-store');
+
+/** Session state of the Evolution instance: 'open' = WhatsApp connected, 'connecting'/'close' = scan the QR. */
+whatsappRouter.get('/status', requireRole('OWNER', 'ADMIN'), async (req, res, next) => {
+  try {
+    const state = await (await evolutionOf(req.auth!.businessId)).connectionState().catch((e: Error) => {
+      throw new AppError(502, 'INTERNAL_ERROR', e instanceof WhatsAppProviderError ? e.message : 'Evolution API unreachable');
+    });
+    noStore(res);
+    res.json({ success: true, data: { state } });
+  } catch (e) {
+    next(e);
+  }
+});
+
+/** The QR links a WhatsApp account to this business: owner only, never cached, never logged. */
+whatsappRouter.post('/qr', requireRole('OWNER'), async (req, res, next) => {
+  try {
+    const evo = await evolutionOf(req.auth!.businessId);
+    const data = await evo.connect().catch((e: Error) => {
+      throw new AppError(502, 'INTERNAL_ERROR', e instanceof WhatsAppProviderError ? e.message : 'Evolution API unreachable');
+    });
+    logger.info({ event: 'whatsapp_qr_requested', businessId: req.auth!.businessId, userId: req.auth!.userId, state: data.state }, 'WhatsApp QR requested');
+    noStore(res);
+    res.json({ success: true, data });
   } catch (e) {
     next(e);
   }

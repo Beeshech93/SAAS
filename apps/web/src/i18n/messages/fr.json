@@ -341,7 +341,17 @@
     "evoApiKeyKeep": "Laisser vide pour conserver la clé actuelle. Stockée chiffrée.",
     "evoWebhookHelp": "Le webhook est enregistré automatiquement dans Evolution à l'enregistrement. Cette URL est secrète : ne la partagez pas.",
     "evoState": "État de la session WhatsApp",
-    "evoWebhookOk": "Webhook enregistré dans Evolution."
+    "evoWebhookOk": "Webhook enregistré dans Evolution.",
+    "evoCreate": "Créer l'instance sur le serveur",
+    "evoCreateHint": "Cochez si l'instance n'existe pas encore : saisissez alors la clé API globale du serveur Evolution. Seule la clé propre à l'instance sera conservée.",
+    "qrTitle": "Connexion par QR code",
+    "qrIntro": "Ouvrez WhatsApp sur le téléphone de l'entreprise → Appareils connectés → Connecter un appareil, puis scannez ce code.",
+    "qrGenerate": "Afficher le QR code",
+    "qrRefresh": "Actualiser le QR",
+    "qrWaiting": "En attente du scan… le code se renouvelle automatiquement.",
+    "qrConnected": "WhatsApp est connecté ✓",
+    "qrPairing": "Ou saisissez ce code de jumelage :",
+    "qrWarning": "Ce code donne accès à votre compte WhatsApp : ne le partagez pas."
   },
   "automation": {
     "title": "Réponses automatiques",
