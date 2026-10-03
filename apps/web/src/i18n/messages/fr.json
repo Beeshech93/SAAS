@@ -1,0 +1,519 @@
+{
+  "common": {
+    "loading": "Chargement…",
+    "error": "Une erreur est survenue. Veuillez réessayer.",
+    "network": "Impossible de joindre le serveur. Vérifiez votre connexion.",
+    "logout": "Se déconnecter",
+    "save": "Enregistrer",
+    "saved": "Modifications enregistrées.",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "add": "Ajouter",
+    "confirmDelete": "Supprimer cet élément ?",
+    "readOnly": "Vous avez un accès en lecture seule.",
+    "soon": "Bientôt",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "landing": {
+    "title": "Automatisez votre service client sur WhatsApp.",
+    "subtitle": "Répondez plus rapidement à vos clients, automatisez les demandes répétitives et laissez votre équipe se concentrer sur les tâches importantes.",
+    "ctaStart": "Commencer gratuitement",
+    "ctaLogin": "Se connecter",
+    "nav": {
+      "how": "Comment ça fonctionne",
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs",
+      "faq": "FAQ",
+      "login": "Se connecter"
+    },
+    "ctaDemo": "Voir la démonstration",
+    "trialNote": "14 jours d'essai, sans carte bancaire.",
+    "demo": {
+      "label": "Exemple de conversation",
+      "customer": "Client",
+      "assistant": "Assistant",
+      "c1": "Bonjour, à quelle heure est le check-in ?",
+      "a1": "Bonjour ! Le check-in commence à 15h00.",
+      "c2": "Pouvez-vous me réserver une chambre double ?",
+      "a2": "Je vais transmettre votre demande à notre équipe, qui vous répondra rapidement.",
+      "note": "Illustration : l'assistant répond uniquement avec les informations que vous avez renseignées et transmet le reste à votre équipe."
+    },
+    "how": {
+      "title": "Comment ça fonctionne",
+      "steps": [
+        {
+          "title": "Renseignez votre entreprise",
+          "text": "Ajoutez vos informations, vos services, vos chambres ou votre menu et vos questions fréquentes."
+        },
+        {
+          "title": "Connectez votre WhatsApp Business",
+          "text": "Reliez votre numéro via l'API officielle WhatsApp. Vos clients continuent de vous écrire comme d'habitude."
+        },
+        {
+          "title": "L'assistant répond, votre équipe garde la main",
+          "text": "Les questions simples reçoivent une réponse automatique ; le reste est transmis à un humain, avec tout l'historique."
+        }
+      ]
+    },
+    "features": {
+      "title": "Fonctionnalités",
+      "items": [
+        {
+          "title": "Réponses basées sur vos informations",
+          "text": "L'assistant n'invente ni prix, ni disponibilité, ni politique : sans information, il passe la main."
+        },
+        {
+          "title": "Boîte de réception partagée",
+          "text": "Toutes les conversations WhatsApp au même endroit, avec statuts et assignation."
+        },
+        {
+          "title": "Transfert vers un humain",
+          "text": "Un client demande une personne ? La conversation est transmise et l'IA se met en pause."
+        },
+        {
+          "title": "Fiches clients",
+          "text": "Chaque numéro devient un client avec son historique et ses notes."
+        },
+        {
+          "title": "Statistiques",
+          "text": "Conversations, messages et temps de première réponse, d'un coup d'œil."
+        },
+        {
+          "title": "Équipe et rôles",
+          "text": "Propriétaire, administrateur, agent : chacun voit et fait ce qui le concerne."
+        }
+      ]
+    },
+    "hotels": {
+      "title": "Pour les hôtels",
+      "text": "Présentez vos chambres, tarifs et équipements, répondez aux questions sur le check-in, le petit-déjeuner ou l'accès, et transmettez les demandes de réservation à votre réception.",
+      "points": [
+        "Chambres avec capacité, équipements et prix",
+        "Questions fréquentes sur les horaires et services",
+        "Demandes de réservation transmises à votre équipe"
+      ]
+    },
+    "restaurants": {
+      "title": "Pour les restaurants",
+      "text": "Partagez votre carte, vos horaires et vos conditions de livraison, et laissez l'assistant répondre aux questions répétitives pendant que votre équipe sert en salle.",
+      "points": [
+        "Menu par catégories avec prix",
+        "Horaires, adresse et informations pratiques",
+        "Commandes et réservations transmises à votre équipe"
+      ]
+    },
+    "pricing": {
+      "title": "Tarifs",
+      "subtitle": "Commencez par un essai gratuit de 14 jours. Changez de plan quand vous voulez.",
+      "loading": "Chargement des tarifs…",
+      "error": "Les tarifs sont momentanément indisponibles.",
+      "popular": "Populaire",
+      "start": "Commencer gratuitement"
+    },
+    "faqSection": {
+      "title": "Questions fréquentes",
+      "items": [
+        {
+          "q": "Utilisez-vous l'API officielle de WhatsApp ?",
+          "a": "Oui. L'application utilise uniquement l'API WhatsApp Business officielle de Meta, via votre propre compte et numéro."
+        },
+        {
+          "q": "L'assistant peut-il se tromper ?",
+          "a": "Il est conçu pour répondre uniquement avec les informations que vous renseignez et pour transmettre à votre équipe dans le doute. Vous pouvez le tester et ajuster vos FAQ à tout moment."
+        },
+        {
+          "q": "Mes données sont-elles séparées de celles des autres entreprises ?",
+          "a": "Oui. Chaque entreprise a son propre espace : clients, conversations, services et configuration sont isolés."
+        },
+        {
+          "q": "Mon équipe peut-elle reprendre une conversation ?",
+          "a": "Oui. Un agent peut prendre la main à tout moment ; l'assistant se met alors en pause jusqu'à ce que vous le réactiviez."
+        },
+        {
+          "q": "Faut-il une carte bancaire pour essayer ?",
+          "a": "Non. L'essai de 14 jours ne demande aucun moyen de paiement."
+        }
+      ]
+    },
+    "final": {
+      "title": "Prêt à gagner du temps sur WhatsApp ?",
+      "text": "Créez votre espace en quelques minutes."
+    },
+    "footer": {
+      "rights": "Tous droits réservés.",
+      "tagline": "Service client WhatsApp pour les entreprises haïtiennes."
+    }
+  },
+  "auth": {
+    "loginTitle": "Connexion",
+    "registerTitle": "Créer votre espace",
+    "name": "Votre nom",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "passwordHint": "10 caractères minimum, avec au moins une lettre et un chiffre.",
+    "businessName": "Nom de l'entreprise",
+    "businessType": "Type d'entreprise",
+    "submitLogin": "Se connecter",
+    "submitRegister": "Créer mon espace",
+    "submitting": "Veuillez patienter…",
+    "noAccount": "Pas encore de compte ?",
+    "haveAccount": "Déjà un compte ?",
+    "errors": {
+      "UNAUTHORIZED": "E-mail ou mot de passe incorrect.",
+      "CONFLICT": "Cet élément existe déjà (e-mail, numéro WhatsApp ou téléphone déjà utilisé).",
+      "VALIDATION_ERROR": "Certaines informations sont invalides. Vérifiez le formulaire.",
+      "RATE_LIMITED": "Trop de tentatives. Réessayez dans quelques minutes.",
+      "FORBIDDEN": "Accès refusé.",
+      "NOT_FOUND": "Élément introuvable.",
+      "NOT_IMPLEMENTED": "Le paiement en ligne n'est pas encore disponible."
+    }
+  },
+  "businessTypes": {
+    "HOTEL": "Hôtel",
+    "RESTAURANT": "Restaurant",
+    "OTHER": "Autre"
+  },
+  "dashboard": {
+    "greeting": "Bonjour, {{businessName}}",
+    "placeholder": "Votre espace est créé. Les conversations, clients, services et FAQ arriveront dans les prochaines étapes.",
+    "role": {
+      "OWNER": "Propriétaire",
+      "ADMIN": "Administrateur",
+      "AGENT": "Agent"
+    },
+    "recent": "Conversations récentes",
+    "noRecent": "Aucune conversation pour le moment.",
+    "seeAll": "Tout voir",
+    "stats": {
+      "conversations": "Conversations",
+      "customers": "Clients",
+      "resolved": "Résolues",
+      "pending": "En attente"
+    }
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "conversations": "Conversations",
+    "customers": "Clients",
+    "services": "Services",
+    "faq": "FAQ",
+    "team": "Équipe",
+    "analytics": "Statistiques",
+    "whatsapp": "WhatsApp",
+    "settings": "Paramètres",
+    "subscription": "Abonnement"
+  },
+  "settings": {
+    "title": "Paramètres de l'entreprise",
+    "name": "Nom",
+    "type": "Type",
+    "description": "Description",
+    "address": "Adresse",
+    "phone": "Téléphone",
+    "email": "E-mail de contact",
+    "website": "Site web",
+    "timezone": "Fuseau horaire",
+    "language": "Langue",
+    "ownerOnly": "Seul le propriétaire peut modifier ces informations.",
+    "languages": {
+      "fr": "Français",
+      "es": "Español",
+      "en": "English",
+      "ht": "Kreyòl ayisyen"
+    },
+    "aiTitle": "Assistant IA",
+    "aiEnabled": "Activer les réponses automatiques de l'assistant",
+    "aiRules": "Règles de l'entreprise (optionnel)",
+    "aiRulesHint": "Informations supplémentaires que l'assistant peut utiliser : politique d'annulation, animaux, paiement… L'assistant n'inventera rien au-delà de ces règles, de vos FAQ et de vos services."
+  },
+  "faq": {
+    "title": "Questions fréquentes",
+    "intro": "L'assistant répondra uniquement à partir de ces réponses.",
+    "question": "Question",
+    "answer": "Réponse",
+    "active": "Active",
+    "empty": "Aucune question pour le moment. Ajoutez votre première FAQ, par exemple « À quelle heure est le check-in ? ».",
+    "new": "Nouvelle question",
+    "inactive": "Désactivée"
+  },
+  "services": {
+    "title": "Services",
+    "intro": "Chambres, plats ou prestations que l'assistant peut présenter.",
+    "empty": "Aucun service pour le moment. Ajoutez votre première chambre, plat ou prestation.",
+    "new": "Nouveau service",
+    "name": "Nom",
+    "kind": "Type",
+    "category": "Catégorie",
+    "description": "Description",
+    "price": "Prix",
+    "currency": "Devise",
+    "capacity": "Capacité (personnes)",
+    "amenities": "Équipements (séparés par des virgules)",
+    "available": "Disponible",
+    "unavailable": "Indisponible",
+    "types": {
+      "ROOM": "Chambre",
+      "MENU_ITEM": "Plat / boisson",
+      "SERVICE": "Service"
+    },
+    "persons": "pers."
+  },
+  "customers": {
+    "title": "Clients",
+    "intro": "Les clients sont créés automatiquement à leur premier message WhatsApp, ou manuellement ici.",
+    "new": "Nouveau client",
+    "name": "Nom",
+    "phone": "Téléphone WhatsApp",
+    "phoneHint": "Avec l'indicatif du pays, par exemple +509 3700 1234.",
+    "email": "E-mail",
+    "country": "Pays",
+    "notes": "Notes",
+    "search": "Rechercher un nom ou un numéro",
+    "empty": "Aucun client pour le moment.",
+    "noResult": "Aucun résultat.",
+    "startConversation": "Démarrer une conversation",
+    "unnamed": "Sans nom"
+  },
+  "inbox": {
+    "title": "Conversations",
+    "empty": "Aucune conversation pour le moment. Elles apparaîtront ici dès qu'un client vous écrira sur WhatsApp.",
+    "select": "Sélectionnez une conversation.",
+    "noMessages": "Aucun message dans cette conversation.",
+    "write": "Écrire un message…",
+    "send": "Envoyer",
+    "filterAll": "Toutes",
+    "status": {
+      "OPEN": "Ouverte",
+      "PENDING": "En attente",
+      "RESOLVED": "Résolue",
+      "CLOSED": "Fermée"
+    },
+    "ai": "IA active",
+    "aiPaused": "IA en pause",
+    "human": "Humain",
+    "take": "Prendre la conversation",
+    "giveBack": "Rendre à l'IA",
+    "assigned": "Assignée à un agent",
+    "unassigned": "Non assignée",
+    "sender": {
+      "CUSTOMER": "Client",
+      "AI": "Assistant",
+      "AGENT": "Agent",
+      "SYSTEM": "Système"
+    },
+    "back": "Retour",
+    "notSent": "Non envoyé (WhatsApp non connecté)",
+    "failed": "Échec d'envoi",
+    "handoffNote": "Conversation transmise à l'équipe.",
+    "assignTo": "Assigner à",
+    "unassignedOption": "Non assignée"
+  },
+  "whatsapp": {
+    "title": "Connexion WhatsApp",
+    "intro": "Connectez le numéro WhatsApp Business de votre entreprise (API officielle WhatsApp Cloud de Meta).",
+    "status": "Statut",
+    "connected": "Connecté",
+    "notConnected": "Non connecté",
+    "disabled": "Désactivé",
+    "webhookTitle": "URL du webhook",
+    "webhookHelp": "Dans la console Meta, collez cette URL comme « URL de rappel » et utilisez le jeton de vérification défini sur le serveur (WHATSAPP_VERIFY_TOKEN). Abonnez-vous au champ « messages ».",
+    "webhookMissing": "Le serveur n'est pas encore configuré pour WhatsApp (WHATSAPP_VERIFY_TOKEN / WHATSAPP_APP_SECRET manquants).",
+    "phoneNumberId": "Identifiant du numéro de téléphone (Phone number ID)",
+    "displayPhone": "Numéro affiché (optionnel)",
+    "token": "Jeton d'accès permanent",
+    "tokenHint": "Stocké chiffré. Il ne sera plus jamais affiché.",
+    "enabled": "Activer la réception et l'envoi",
+    "save": "Enregistrer la connexion",
+    "disconnect": "Déconnecter",
+    "confirmDisconnect": "Déconnecter WhatsApp ? Les messages ne seront plus reçus.",
+    "ownerOnly": "Seul le propriétaire peut modifier la connexion WhatsApp."
+  },
+  "ai": {
+    "unavailable": "L'assistant IA n'est pas encore configuré sur le serveur (AI_API_KEY manquante).",
+    "previewTitle": "Tester l'assistant",
+    "previewHelp": "Simulation : rien n'est enregistré ni envoyé sur WhatsApp. Enregistrez d'abord vos modifications.",
+    "placeholder": "Écrivez comme un client…",
+    "send": "Tester",
+    "you": "Client",
+    "assistant": "Assistant",
+    "actions": {
+      "answer": "",
+      "no_info": "→ transmis à l'équipe (information manquante)",
+      "handoff": "→ transmis à l'équipe",
+      "blocked": "→ message bloqué par la protection",
+      "disabled": "→ assistant désactivé",
+      "error": "→ erreur du service IA"
+    }
+  },
+  "analytics": {
+    "title": "Statistiques",
+    "intro": "Activité de votre assistant et de votre équipe.",
+    "conversations": "Conversations",
+    "total": "Total",
+    "open": "Ouvertes",
+    "pending": "En attente",
+    "resolved": "Résolues",
+    "closed": "Fermées",
+    "customers": "Clients",
+    "messages": "Messages",
+    "received": "Reçus",
+    "sent": "Envoyés (IA + équipe)",
+    "byAI": "Envoyés par l'IA",
+    "byAgent": "Envoyés par l'équipe",
+    "firstResponse": "Temps de première réponse (30 jours)",
+    "average": "Moyenne",
+    "ai": "IA",
+    "agent": "Équipe",
+    "noData": "Pas encore assez de données.",
+    "sample": "{{n}} conversation(s) mesurée(s)",
+    "daily": "Messages des 7 derniers jours",
+    "legendIn": "Reçus",
+    "legendOut": "Envoyés",
+    "seconds": "{{n}} s",
+    "minutes": "{{n}} min",
+    "hours": "{{n}} h",
+    "forbidden": "Les statistiques sont réservées aux propriétaires et administrateurs."
+  },
+  "team": {
+    "title": "Équipe",
+    "intro": "Invitez vos collaborateurs. Ils créent eux-mêmes leur mot de passe.",
+    "members": "Membres",
+    "invitations": "Invitations en attente",
+    "invite": "Inviter un collaborateur",
+    "email": "E-mail",
+    "role": "Rôle",
+    "send": "Créer l'invitation",
+    "linkReady": "Invitation créée. Copiez ce lien et envoyez-le à la personne (valable 7 jours, affiché une seule fois) :",
+    "copy": "Copier le lien",
+    "copied": "Lien copié",
+    "remove": "Retirer",
+    "revoke": "Annuler",
+    "confirmRemove": "Retirer cette personne de l'équipe ? Ses conversations seront remises à l'IA.",
+    "expires": "expire le {{date}}",
+    "you": "vous",
+    "noInvites": "Aucune invitation en attente.",
+    "roles": {
+      "OWNER": "Propriétaire",
+      "ADMIN": "Administrateur",
+      "AGENT": "Agent"
+    },
+    "ownerOnly": "Seul le propriétaire peut inviter ou modifier les membres."
+  },
+  "invite": {
+    "title": "Rejoindre {{businessName}}",
+    "intro": "Vous avez été invité avec le rôle : {{role}}.",
+    "invalid": "Cette invitation est invalide ou a expiré. Demandez-en une nouvelle au propriétaire.",
+    "submit": "Créer mon compte"
+  },
+  "limits": {
+    "SUBSCRIPTION_INACTIVE": "Votre abonnement n'est pas actif. Passez à un plan payant pour continuer à envoyer des messages.",
+    "MESSAGE_LIMIT_REACHED": "Vous avez atteint la limite de messages de votre plan ce mois-ci.",
+    "USER_LIMIT_REACHED": "Vous avez atteint la limite d'utilisateurs de votre plan.",
+    "FEATURE_NOT_IN_PLAN": "Cette fonctionnalité n'est pas incluse dans votre plan.",
+    "default": "Limite du plan atteinte."
+  },
+  "subscription": {
+    "title": "Abonnement",
+    "intro": "Votre plan, votre consommation et les plans disponibles.",
+    "current": "Plan actuel",
+    "status": {
+      "TRIALING": "Période d'essai",
+      "ACTIVE": "Actif",
+      "PAST_DUE": "Paiement en retard",
+      "CANCELED": "Annulé",
+      "EXPIRED": "Expiré"
+    },
+    "trialEnds": "L'essai se termine le {{date}}",
+    "inactive": "Votre abonnement n'est pas actif : l'assistant et l'envoi de messages sont suspendus. Les messages reçus restent enregistrés.",
+    "usage": "Consommation du mois",
+    "messages": "Messages envoyés (IA + équipe)",
+    "users": "Utilisateurs (membres + invitations)",
+    "plans": "Plans",
+    "perMonth": "/ mois",
+    "messagesLimit": "{{n}} messages / mois",
+    "usersLimit": "{{n}} utilisateurs",
+    "choose": "Choisir ce plan",
+    "currentBadge": "Plan actuel",
+    "paymentsSoon": "Le paiement en ligne sera bientôt disponible. En attendant, contactez-nous pour changer de plan.",
+    "changed": "Plan mis à jour.",
+    "features": {
+      "ai": "Assistant IA",
+      "analytics": "Statistiques",
+      "customBranding": "Personnalisation",
+      "prioritySupport": "Support prioritaire"
+    },
+    "ownerOnly": "Seul le propriétaire peut gérer l'abonnement."
+  },
+  "onboarding": {
+    "title": "Configurons votre espace",
+    "skip": "Passer pour l'instant",
+    "stepOf": "Étape {{n}} sur {{total}}",
+    "next": "Continuer",
+    "back": "Retour",
+    "saving": "Enregistrement…",
+    "steps": [
+      "Entreprise",
+      "Type",
+      "Informations",
+      "FAQ et services",
+      "WhatsApp"
+    ],
+    "s1": {
+      "title": "Comment s'appelle votre entreprise ?",
+      "hint": "Ce nom sera utilisé par l'assistant pour se présenter."
+    },
+    "s2": {
+      "title": "Quel type d'entreprise êtes-vous ?"
+    },
+    "s3": {
+      "title": "Informations pratiques",
+      "hint": "L'assistant s'appuiera uniquement sur ces informations. Laissez vide ce que vous ne souhaitez pas communiquer."
+    },
+    "s4": {
+      "title": "FAQ et services",
+      "hint": "Ajoutez quelques éléments pour commencer. Vous pourrez en ajouter d'autres à tout moment.",
+      "faqTitle": "Questions fréquentes",
+      "faqSuggest": "Suggestions (écrivez ensuite votre propre réponse) :",
+      "addFaq": "Ajouter la question",
+      "serviceTitle": "Premier service",
+      "addService": "Ajouter",
+      "added": "Ajouté :",
+      "hotelService": "Chambre",
+      "restaurantService": "Plat ou boisson",
+      "otherService": "Service",
+      "nothingYet": "Rien d'ajouté pour l'instant. Vous pouvez aussi le faire plus tard."
+    },
+    "s5": {
+      "title": "Connecter WhatsApp",
+      "hint": "Vous aurez besoin d'un compte WhatsApp Business (API officielle de Meta). Vous pouvez aussi le faire plus tard depuis la page WhatsApp.",
+      "later": "Je le ferai plus tard",
+      "connected": "WhatsApp est connecté."
+    },
+    "finish": "Terminer",
+    "readyTitle": "Votre espace est prêt.",
+    "readyText": "Vous pouvez maintenant suivre les conversations, ajuster vos FAQ et inviter votre équipe.",
+    "goDashboard": "Ouvrir le tableau de bord",
+    "ownerOnly": "Seul le propriétaire peut configurer l'espace."
+  },
+  "faqSuggestions": {
+    "HOTEL": [
+      "À quelle heure est le check-in ?",
+      "À quelle heure est le check-out ?",
+      "Le petit-déjeuner est-il inclus ?",
+      "Y a-t-il un parking ?"
+    ],
+    "RESTAURANT": [
+      "Quels sont vos horaires d'ouverture ?",
+      "Faites-vous la livraison ?",
+      "Peut-on réserver une table ?",
+      "Avez-vous des options végétariennes ?"
+    ],
+    "OTHER": [
+      "Quels sont vos horaires d'ouverture ?",
+      "Où êtes-vous situés ?",
+      "Comment vous contacter ?"
+    ]
+  }
+}

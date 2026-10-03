@@ -1,0 +1,347 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BusinessType {
+  HOTEL
+  RESTAURANT
+  OTHER
+}
+
+enum BusinessStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum ServiceType {
+  ROOM // hotel room
+  MENU_ITEM // restaurant dish/drink
+  SERVICE // anything else
+}
+
+enum ConversationStatus {
+  OPEN
+  PENDING
+  RESOLVED
+  CLOSED
+}
+
+enum Channel {
+  WHATSAPP
+  INSTAGRAM
+  MESSENGER
+  WEB_CHAT
+}
+
+enum SenderType {
+  CUSTOMER
+  AI
+  AGENT
+  SYSTEM
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  DOCUMENT
+  AUDIO
+  BUTTON
+  LIST
+}
+
+enum Direction {
+  INBOUND
+  OUTBOUND
+}
+
+enum IntegrationStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum PlanCode {
+  STARTER
+  BUSINESS
+  PRO
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  EXPIRED
+}
+
+enum MemberRole {
+  OWNER
+  ADMIN
+  AGENT
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  memberships           BusinessMember[]
+  refreshTokens         RefreshToken[]
+  assignedConversations Conversation[]
+}
+
+model Business {
+  id          String         @id @default(uuid()) @db.Uuid
+  name        String
+  type        BusinessType   @default(OTHER)
+  description String?
+  address     String?
+  phone       String?
+  email       String?
+  website     String?
+  timezone    String         @default("America/Port-au-Prince")
+  language    String         @default("fr")
+  logo        String?
+  status      BusinessStatus @default(ACTIVE)
+  // AI assistant switch and owner-written business rules (extra context for the AI).
+  aiEnabled   Boolean        @default(true)
+  aiRules     String?
+  // Set when the owner finishes (or skips) the onboarding wizard.
+  onboardedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  members  BusinessMember[]
+  faqs     Faq[]
+  services Service[]
+
+  customers     Customer[]
+  conversations Conversation[]
+  messages      Message[]
+  whatsapp      WhatsAppIntegration?
+  invitations   Invitation[]
+  subscription  Subscription?
+  usage         Usage[]
+}
+
+// A user can belong to several businesses; the role is per business.
+model BusinessMember {
+  id         String     @id @default(uuid()) @db.Uuid
+  userId     String     @db.Uuid
+  businessId String     @db.Uuid
+  role       MemberRole @default(AGENT)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId])
+  @@index([businessId])
+}
+
+// Stored hashed (SHA-256); the raw token only lives in the httpOnly cookie.
+model RefreshToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Faq {
+  id         String   @id @default(uuid()) @db.Uuid
+  businessId String   @db.Uuid
+  question   String
+  answer     String
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, active])
+}
+
+// One flexible model for hotel rooms, restaurant items and generic services.
+// Hotel: capacity + amenities. Restaurant: category. All: name, price, description, available.
+model Service {
+  id          String      @id @default(uuid()) @db.Uuid
+  businessId  String      @db.Uuid
+  type        ServiceType @default(SERVICE)
+  name        String
+  category    String?
+  description String?
+  price       Decimal?    @db.Decimal(12, 2)
+  currency    String      @default("HTG")
+  capacity    Int?
+  amenities   String[]
+  available   Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, type])
+}
+
+// Phone is stored normalized (E.164 style, e.g. +50937001234) and is unique per business.
+model Customer {
+  id         String   @id @default(uuid()) @db.Uuid
+  businessId String   @db.Uuid
+  name       String?
+  phone      String
+  email      String?
+  country    String?
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  business      Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  conversations Conversation[]
+
+  @@unique([businessId, phone])
+  @@index([businessId, createdAt])
+}
+
+model Conversation {
+  id                 String             @id @default(uuid()) @db.Uuid
+  businessId         String             @db.Uuid
+  customerId         String             @db.Uuid
+  status             ConversationStatus @default(OPEN)
+  channel            Channel            @default(WHATSAPP)
+  assignedToId       String?            @db.Uuid
+  // AI ACTIVE = true, AI PAUSED = false. Paused automatically when a human takes over.
+  aiActive           Boolean            @default(true)
+  lastMessageAt      DateTime           @default(now())
+  lastMessagePreview String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  assignedTo User?     @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
+  messages   Message[]
+
+  @@index([businessId, status, lastMessageAt])
+  @@index([businessId, assignedToId])
+  @@index([customerId])
+}
+
+model Message {
+  id             String      @id @default(uuid()) @db.Uuid
+  conversationId String      @db.Uuid
+  // Denormalized so every message query can be scoped by tenant directly.
+  businessId     String      @db.Uuid
+  senderType     SenderType
+  senderId       String?
+  content        String
+  messageType    MessageType @default(TEXT)
+  direction      Direction
+  metadata       Json?
+  // Provider message id (WhatsApp wamid); used to ignore webhook retries.
+  externalId     String?
+  createdAt      DateTime    @default(now())
+
+  business     Business     @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, externalId])
+  @@index([conversationId, createdAt])
+  @@index([businessId])
+}
+
+// One WhatsApp Business number per business. phoneNumberId is globally unique so an
+// incoming webhook maps to exactly one tenant. The access token is stored encrypted (AES-256-GCM).
+model WhatsAppIntegration {
+  id                 String            @id @default(uuid()) @db.Uuid
+  businessId         String            @unique @db.Uuid
+  phoneNumberId      String            @unique
+  displayPhoneNumber String?
+  accessTokenEnc     String
+  status             IntegrationStatus @default(ACTIVE)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+}
+
+// Team invitation. The raw token is shown once to the inviter (as a link); only its hash is stored.
+model Invitation {
+  id          String     @id @default(uuid()) @db.Uuid
+  businessId  String     @db.Uuid
+  email       String
+  role        MemberRole
+  tokenHash   String     @unique
+  invitedById String     @db.Uuid
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  createdAt   DateTime   @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, acceptedAt])
+}
+
+// Catalog. Seeded from code defaults on first use; afterwards the database values win (editable by ops).
+model Plan {
+  id           String   @id @default(uuid()) @db.Uuid
+  code         PlanCode @unique
+  name         String
+  priceCents   Int
+  currency     String   @default("USD")
+  messageLimit Int // outbound AI+agent messages per calendar month (UTC)
+  userLimit    Int // team members + pending invitations
+  featureFlags Json
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id                     String             @id @default(uuid()) @db.Uuid
+  businessId             String             @unique @db.Uuid
+  planId                 String             @db.Uuid
+  status                 SubscriptionStatus @default(TRIALING)
+  trialEndsAt            DateTime?
+  currentPeriodEnd       DateTime?
+  cancelAtPeriodEnd      Boolean            @default(false)
+  // Reserved for the future payment provider.
+  externalCustomerId     String?
+  externalSubscriptionId String?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  plan     Plan     @relation(fields: [planId], references: [id])
+
+  @@index([planId])
+}
+
+model Usage {
+  id         String   @id @default(uuid()) @db.Uuid
+  businessId String   @db.Uuid
+  period     String // "YYYY-MM" (UTC)
+  messages   Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, period])
+}
