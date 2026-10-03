@@ -60,3 +60,7 @@ On save the API checks `/instance/connectionState`, then registers its own webho
 `<APP_URL>/api/webhooks/evolution/<integrationId>/<secret>` (the secret is generated per connection and is only shown to the owner).
 Targets Evolution API **v2**. Limits: text/media only (no templates), incoming media is stored as a placeholder (no download), group chats and `@lid` senders are ignored.
 Needs `ENCRYPTION_KEY` (stores the apikey encrypted). No new environment variables. Migration: `20261003000000_evolution`.
+
+## Restricting registration
+
+Set `REGISTRATION_ALLOWED_EMAILS` (comma-separated) to allow only those emails to create a new business via `/register`; others get 403. Empty/unset = open registration. Team members still join through invitations.

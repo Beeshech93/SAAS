@@ -23,6 +23,12 @@ const schema = z.object({
   ENCRYPTION_KEY: optional(
     z.string().refine((v) => Buffer.from(v, 'base64').length === 32, 'ENCRYPTION_KEY must be 32 bytes, base64-encoded'),
   ),
+  // Comma-separated emails allowed to create a new business via /register. Empty = open registration.
+  // Team members join through invitations, which this does not affect.
+  REGISTRATION_ALLOWED_EMAILS: z
+    .string()
+    .default('')
+    .transform((v) => v.split(',').map((e) => e.trim().toLowerCase()).filter(Boolean)),
   // AI (Anthropic Messages API). Without AI_API_KEY the assistant is simply off.
   AI_API_KEY: optional(z.string().min(10)),
   AI_MODEL: z.string().default('claude-sonnet-5-5'),

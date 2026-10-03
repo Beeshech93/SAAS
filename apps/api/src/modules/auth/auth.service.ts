@@ -1,6 +1,6 @@
 import { Prisma, BusinessType } from '@prisma/client';
 import { env } from '../../config/env';
-import { AppError, conflict, unauthorized } from '../../lib/errors';
+import { AppError, conflict, forbidden, unauthorized } from '../../lib/errors';
 import { securityLog } from '../../lib/logger';
 import { hashPassword, verifyPassword } from '../../lib/password';
 import { prisma } from '../../lib/prisma';
@@ -29,6 +29,9 @@ export async function register(input: {
   businessName: string;
   businessType: BusinessType;
 }) {
+  if (env.REGISTRATION_ALLOWED_EMAILS.length && !env.REGISTRATION_ALLOWED_EMAILS.includes(input.email.toLowerCase())) {
+    throw forbidden('Registration is by invitation only');
+  }
   if (await prisma.user.findUnique({ where: { email: input.email } })) {
     throw conflict('Email already registered');
   }
