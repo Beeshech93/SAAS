@@ -44,7 +44,9 @@ export function createApp() {
     }),
   );
 
-  app.get('/health', (_req, res) => res.json({ success: true, data: { status: 'ok' } }));
+  const health: express.RequestHandler = (_req, res) => res.json({ success: true, data: { status: 'ok' } });
+  app.get('/health', health);
+  app.get('/api/health', health); // reachable through the /api/* public route on Vercel
   app.use('/api/auth', authRouter);
   app.use('/api/business', businessRouter);
   app.use('/api/faqs', faqRouter);

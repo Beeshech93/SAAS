@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+// On Vercel the top-level vercel.json rewrites route /api/* to the api service, so no proxy here.
+const onVercel = !!process.env.VERCEL;
 const apiUrl = process.env.API_URL || 'http://localhost:4000';
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -29,7 +31,7 @@ const securityHeaders = [
 ];
 
 export default {
-  output: 'standalone',
+  ...(onVercel ? {} : { output: 'standalone' }), // standalone is for the Docker image
   poweredByHeader: false,
   // Same-origin proxy: the browser only talks to the web origin, so the
   // httpOnly SameSite=Strict refresh cookie works without CORS tricks.
@@ -37,6 +39,7 @@ export default {
     return [{ source: '/:path*', headers: securityHeaders }];
   },
   async rewrites() {
+    if (onVercel) return [];
     return [{ source: '/api/:path*', destination: `${apiUrl}/api/:path*` }];
   },
 };

@@ -30,7 +30,7 @@ const schema = z.object({
   // Dev/staging only: lets an owner switch plan without payment. Keep false in production until a payment provider is wired.
   BILLING_SELF_SERVICE: z.enum(['true', 'false']).default('false').transform((v) => v === 'true'),
   // Number of reverse proxies in front of the API (the Next.js server counts as one). 0 = none.
-  TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
+  TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(process.env.VERCEL ? 1 : 0),
   RATE_LIMIT_API_PER_MIN: z.coerce.number().int().positive().default(300),
   RATE_LIMIT_AUTH_MAX: z.coerce.number().int().positive().default(20),
 });
