@@ -43,7 +43,7 @@ Differences from the Docker setup, handled in code: the Express app is exported 
 
 **Before the first deploy**
 1. **Database**: Vercel has no local PostgreSQL. Use a managed one (e.g. Neon or Supabase from the Vercel Marketplace) and set `DATABASE_URL` to the **pooled** connection string (serverless opens many short connections; for pgbouncer-style poolers add `?pgbouncer=true&connection_limit=1`).
-2. **Migrations are not run by the deploy.** Run `npm run prisma:deploy -w apps/api` from CI or your machine against the production database (take a backup first). Do not point preview deployments at the production database.
+2. **Migrations**: the `api` build (`npm run build:vercel`) runs `prisma migrate deploy` **only for production builds** (`VERCEL_ENV=production`), using `DATABASE_URL_UNPOOLED` (Neon's direct endpoint; the pooler cannot run migrations). Preview builds only generate the client. Take a backup before releasing a destructive migration. Neon pooled URLs (`-pooler` host) automatically get `pgbouncer=true&connection_limit=1` at runtime (`src/lib/prisma.ts`).
 3. **Environment variables** (Project → Settings → Environment Variables, separate values for Preview/Production): `DATABASE_URL`, `JWT_SECRET`, `ENCRYPTION_KEY`, `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_APP_SECRET`, `AI_API_KEY`, and `APP_URL` = your public https domain. Leave `BILLING_SELF_SERVICE` unset/false in production.
 4. **Meta webhook** URL: `https://<your-domain>/api/webhooks/whatsapp`.
 5. Smoke test `GET https://<your-domain>/api/health`.
