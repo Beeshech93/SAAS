@@ -328,7 +328,18 @@
     "save": "Enregistrer la connexion",
     "disconnect": "Déconnecter",
     "confirmDisconnect": "Déconnecter WhatsApp ? Les messages ne seront plus reçus.",
-    "ownerOnly": "Seul le propriétaire peut modifier la connexion WhatsApp."
+    "ownerOnly": "Seul le propriétaire peut modifier la connexion WhatsApp.",
+    "provider": "Type de connexion",
+    "providerCloud": "API officielle WhatsApp Cloud (Meta)",
+    "providerEvolution": "Evolution API (auto-hébergée)",
+    "evoBaseUrl": "URL du serveur Evolution",
+    "evoBaseUrlHint": "Ex. https://evolution.mondomaine.com",
+    "evoInstance": "Nom de l'instance",
+    "evoApiKey": "Clé API (apikey)",
+    "evoApiKeyKeep": "Laisser vide pour conserver la clé actuelle. Stockée chiffrée.",
+    "evoWebhookHelp": "Le webhook est enregistré automatiquement dans Evolution à l'enregistrement. Cette URL est secrète : ne la partagez pas.",
+    "evoState": "État de la session WhatsApp",
+    "evoWebhookOk": "Webhook enregistré dans Evolution."
   },
   "ai": {
     "unavailable": "L'assistant IA n'est pas encore configuré sur le serveur (AI_API_KEY manquante).",

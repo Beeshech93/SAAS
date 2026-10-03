@@ -9,6 +9,15 @@ export interface DeliveryResult {
   error?: string;
 }
 
+type Integration = NonNullable<Awaited<ReturnType<typeof loadActiveIntegration>>>;
+const credsOf = (i: Integration) => ({
+  phoneNumberId: i.phoneNumberId,
+  accessToken: decrypt(i.accessTokenEnc),
+  provider: i.provider,
+  baseUrl: i.baseUrl,
+  instanceName: i.instanceName,
+});
+
 export async function loadActiveIntegration(businessId: string) {
   return prisma.whatsAppIntegration.findFirst({ where: { businessId, status: 'ACTIVE' } });
 }
@@ -18,7 +27,7 @@ export async function deliverText(businessId: string, to: string, text: string):
   const integration = await loadActiveIntegration(businessId);
   if (!integration) return { delivery: 'not_configured' };
   try {
-    const provider = getProvider({ phoneNumberId: integration.phoneNumberId, accessToken: decrypt(integration.accessTokenEnc) });
+    const provider = getProvider(credsOf(integration));
     const { messageId } = await provider.sendTextMessage(to, text);
     return { delivery: 'sent', messageId };
   } catch (err) {
@@ -32,7 +41,7 @@ export async function markInboundAsRead(businessId: string, messageId: string) {
   try {
     const integration = await loadActiveIntegration(businessId);
     if (!integration) return;
-    await getProvider({ phoneNumberId: integration.phoneNumberId, accessToken: decrypt(integration.accessTokenEnc) }).markAsRead(messageId);
+    await getProvider(credsOf(integration)).markAsRead(messageId);
   } catch (err) {
     logger.debug({ event: 'whatsapp_mark_read_failed', businessId, error: (err as Error).message }, 'markAsRead failed');
   }

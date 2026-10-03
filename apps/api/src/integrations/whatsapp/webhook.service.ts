@@ -60,7 +60,7 @@ const payloadSchema = z.object({
     .default([]),
 });
 
-type Inbound = z.infer<typeof inboundMessage>;
+export type Inbound = z.infer<typeof inboundMessage>;
 
 const MAX = 4096;
 
@@ -133,7 +133,7 @@ export async function handleWebhookPayload(payload: unknown): Promise<{ processe
   return { processed };
 }
 
-async function processInbound(businessId: string, msg: Inbound, profileName: string | null): Promise<boolean> {
+export async function processInbound(businessId: string, msg: Inbound, profileName: string | null): Promise<boolean> {
   // Idempotency: Meta retries deliveries.
   if (await prisma.message.findFirst({ where: { businessId, externalId: msg.id } })) return false;
 

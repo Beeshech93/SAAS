@@ -66,6 +66,11 @@ enum IntegrationStatus {
   DISABLED
 }
 
+enum WhatsAppProviderType {
+  CLOUD_API
+  EVOLUTION
+}
+
 enum PlanCode {
   STARTER
   BUSINESS
@@ -274,6 +279,12 @@ model WhatsAppIntegration {
   displayPhoneNumber String?
   accessTokenEnc     String
   status             IntegrationStatus @default(ACTIVE)
+  // EVOLUTION = a self-hosted Evolution API instance (accessTokenEnc holds its apikey;
+  // phoneNumberId is a synthetic "evo:<instance>@<host>"; webhookSecret authenticates its webhook calls).
+  provider           WhatsAppProviderType @default(CLOUD_API)
+  baseUrl            String?
+  instanceName       String?
+  webhookSecret      String?
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
 

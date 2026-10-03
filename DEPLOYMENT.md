@@ -51,3 +51,12 @@ Differences from the Docker setup, handled in code: the Express app is exported 
 Local multi-service run: `vercel dev`.
 
 Serverless caveats: rate limits and the AI per-conversation cap are in memory per function instance (use Redis/Upstash before relying on them); the webhook answers synchronously, so the function's maximum duration must cover one AI call (Fluid compute defaults are generous); the Prisma `rhel-openssl-3.0.x` engine is generated at build (`buildCommand`).
+
+
+## WhatsApp via Evolution API (alternative to Meta Cloud API)
+
+In **Dashboard → WhatsApp** choose "Evolution API" and enter the server URL (https, public), the instance name and the instance `apikey`.
+On save the API checks `/instance/connectionState`, then registers its own webhook in Evolution (`/webhook/set`, event `MESSAGES_UPSERT`):
+`<APP_URL>/api/webhooks/evolution/<integrationId>/<secret>` (the secret is generated per connection and is only shown to the owner).
+Targets Evolution API **v2**. Limits: text/media only (no templates), incoming media is stored as a placeholder (no download), group chats and `@lid` senders are ignored.
+Needs `ENCRYPTION_KEY` (stores the apikey encrypted). No new environment variables. Migration: `20261003000000_evolution`.

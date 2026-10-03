@@ -20,6 +20,10 @@ export interface WhatsAppProvider {
 export interface ProviderCredentials {
   phoneNumberId: string;
   accessToken: string;
+  /** Evolution API only: `accessToken` is then the instance apikey. */
+  provider?: 'CLOUD_API' | 'EVOLUTION';
+  baseUrl?: string | null;
+  instanceName?: string | null;
 }
 
 export class WhatsAppProviderError extends Error {
@@ -87,8 +91,80 @@ export class CloudApiProvider implements WhatsAppProvider {
   }
 }
 
+/** Evolution API (v2): a self-hosted gateway that drives a WhatsApp session. Text and media only (no templates). */
+export class EvolutionApiProvider implements WhatsAppProvider {
+  constructor(private readonly creds: { baseUrl: string; instanceName: string; apiKey: string }) {}
+
+  private async request(method: 'GET' | 'POST', path: string, body?: Record<string, unknown>): Promise<any> {
+    const url = `${this.creds.baseUrl}${path}/${encodeURIComponent(this.creds.instanceName)}`;
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        method,
+        headers: { apikey: this.creds.apiKey, 'Content-Type': 'application/json' },
+        body: body ? JSON.stringify(body) : undefined,
+        signal: AbortSignal.timeout(10_000),
+        redirect: 'error',
+      });
+    } catch {
+      throw new WhatsAppProviderError('Evolution API unreachable');
+    }
+    const json: any = await res.json().catch(() => null);
+    if (!res.ok) {
+      // Only the API's message is surfaced; never the request (it carries the apikey).
+      const m = json?.response?.message ?? json?.message ?? json?.error;
+      throw new WhatsAppProviderError(typeof m === 'string' ? m : Array.isArray(m) ? m.join(', ') : `Evolution API error ${res.status}`, res.status);
+    }
+    return json;
+  }
+
+  private static number = (phone: string) => phone.replace(/^\+/, '');
+
+  private async send(path: string, body: Record<string, unknown>): Promise<SendResult> {
+    const json = await this.request('POST', path, body);
+    const messageId = json?.key?.id;
+    if (!messageId) throw new WhatsAppProviderError('Evolution API returned no message id');
+    return { messageId };
+  }
+
+  sendTextMessage(to: string, text: string) {
+    return this.send('/message/sendText', { number: EvolutionApiProvider.number(to), text });
+  }
+
+  sendTemplateMessage(): Promise<SendResult> {
+    return Promise.reject(new WhatsAppProviderError('Template messages are not supported with Evolution API'));
+  }
+
+  sendImageMessage(to: string, i: { url: string; caption?: string }) {
+    return this.send('/message/sendMedia', { number: EvolutionApiProvider.number(to), mediatype: 'image', media: i.url, caption: i.caption });
+  }
+
+  sendDocumentMessage(to: string, d: { url: string; filename?: string; caption?: string }) {
+    return this.send('/message/sendMedia', { number: EvolutionApiProvider.number(to), mediatype: 'document', media: d.url, fileName: d.filename, caption: d.caption });
+  }
+
+  /** Evolution needs the chat JID to mark as read; we only keep the message id, so this is a no-op. */
+  async markAsRead() {}
+
+  /** Instance state: 'open' means the WhatsApp session is connected. */
+  async connectionState(): Promise<string> {
+    const json = await this.request('GET', '/instance/connectionState');
+    return String(json?.instance?.state ?? json?.state ?? 'unknown');
+  }
+
+  /** Points the instance's webhook at us (Evolution v2 payload), for incoming messages only. */
+  async registerWebhook(url: string): Promise<void> {
+    await this.request('POST', '/webhook/set', {
+      webhook: { enabled: true, url, byEvents: false, base64: false, events: ['MESSAGES_UPSERT'] },
+    });
+  }
+}
+
 type Factory = (creds: ProviderCredentials) => WhatsAppProvider;
-let factory: Factory = (creds) => new CloudApiProvider(creds);
+let factory: Factory = (creds) =>
+  creds.provider === 'EVOLUTION'
+    ? new EvolutionApiProvider({ baseUrl: creds.baseUrl ?? '', instanceName: creds.instanceName ?? '', apiKey: creds.accessToken })
+    : new CloudApiProvider(creds);
 
 export const getProvider = (creds: ProviderCredentials) => factory(creds);
 /** Test seam / alternative-provider hook. */

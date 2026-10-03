@@ -95,7 +95,7 @@ export function createFakePrisma() {
   const customer = table();
   const conversation = table(() => ({ status: 'OPEN', channel: 'WHATSAPP', aiActive: true, assignedToId: null, lastMessageAt: new Date() }));
   const message = table(() => ({ messageType: 'TEXT' }));
-  const whatsAppIntegration = table(() => ({ status: 'ACTIVE', displayPhoneNumber: null }));
+  const whatsAppIntegration = table(() => ({ status: 'ACTIVE', displayPhoneNumber: null, provider: 'CLOUD_API', baseUrl: null, instanceName: null, webhookSecret: null }));
   const invitation = table(() => ({ acceptedAt: null }));
   const plan = table(() => ({ currency: 'USD', active: true }));
   const subscription = table(() => ({ status: 'TRIALING', trialEndsAt: null, currentPeriodEnd: null }));

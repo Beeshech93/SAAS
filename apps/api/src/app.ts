@@ -8,6 +8,7 @@ import { errorHandler, notFoundHandler } from './middleware/error';
 import { authRouter } from './modules/auth/auth.routes';
 import { businessRouter } from './modules/business/business.routes';
 import { whatsappWebhookRouter } from './integrations/whatsapp/webhook.routes';
+import { evolutionWebhookRouter } from './integrations/whatsapp/evolution.webhook';
 import { plansRouter, subscriptionRouter } from './modules/billing/billing.routes';
 import { analyticsRouter } from './modules/analytics/analytics.routes';
 import { teamRouter } from './modules/team/team.routes';
@@ -62,6 +63,7 @@ export function createApp() {
   app.use('/api/subscription', subscriptionRouter);
   app.use('/api/webhooks/whatsapp', whatsappWebhookRouter);
   app.use('/webhooks/whatsapp', whatsappWebhookRouter);
+  app.use('/api/webhooks/evolution', evolutionWebhookRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
