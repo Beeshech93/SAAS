@@ -8,9 +8,15 @@ import { renderTemplate } from '../automation/rules.service';
 
 const sleep = (ms: number) => (ms > 0 ? new Promise((r) => setTimeout(r, ms)) : Promise.resolve());
 
-/** Customers a campaign would reach right now: not opted out, optionally active in the last N days. */
-export async function audience(businessId: string, recentDays?: number | null) {
-  let customers = await prisma.customer.findMany({ where: { businessId, marketingOptOut: false } });
+/** Customers a campaign would reach right now: not opted out, optionally members of a list and/or active in the last N days. */
+export async function audience(businessId: string, recentDays?: number | null, listId?: string | null) {
+  let ids: string[] | null = null;
+  if (listId) {
+    if (!(await prisma.customerList.findFirst({ where: { id: listId, businessId } }))) throw new AppError(400, 'VALIDATION_ERROR', 'List not found');
+    ids = (await prisma.customerListMember.findMany({ where: { listId } })).map((m) => m.customerId);
+    if (!ids.length) return [];
+  }
+  let customers = await prisma.customer.findMany({ where: { businessId, marketingOptOut: false, ...(ids ? { id: { in: ids } } : {}) } });
   if (recentDays) {
     const since = new Date(Date.now() - recentDays * 86400_000);
     const active = await prisma.conversation.findMany({ where: { businessId, lastMessageAt: { gte: since } } });
@@ -34,7 +40,7 @@ export async function startCampaign(businessId: string, id: string) {
   const allowed = await canSend(businessId);
   if (!allowed.ok) throw planLimitError(allowed.reason);
 
-  const customers = await audience(businessId, campaign.recentDays);
+  const customers = await audience(businessId, campaign.recentDays, campaign.listId);
   if (!customers.length) throw new AppError(400, 'VALIDATION_ERROR', 'No recipients for this audience');
   const e = await getEntitlements(businessId);
   const remaining = e.limits.messages - e.usage.messages;

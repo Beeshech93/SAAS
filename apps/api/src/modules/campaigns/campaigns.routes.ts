@@ -12,8 +12,9 @@ const base = z.object({
   name: z.string().trim().min(1).max(100),
   message: z.string().trim().min(1).max(1000),
   recentDays: z.number().int().min(1).max(365).nullable(),
+  listId: z.string().uuid().nullable(),
 });
-const createSchema = base.extend({ recentDays: base.shape.recentDays.default(null) }).strict();
+const createSchema = base.extend({ recentDays: base.shape.recentDays.default(null), listId: base.shape.listId.default(null) }).strict();
 const updateSchema = base.partial().strict().refine((o) => Object.keys(o).length > 0, { message: 'At least one field is required' });
 
 export const campaignsRouter = Router();
@@ -32,16 +33,26 @@ campaignsRouter.get('/audience', async (req, res, next) => {
   try {
     const days = z.coerce.number().int().min(1).max(365).optional().safeParse(req.query.recentDays || undefined);
     if (!days.success) throw new AppError(400, 'VALIDATION_ERROR', 'recentDays must be 1-365');
+    const listId = z.string().uuid().optional().safeParse(req.query.listId || undefined);
+    if (!listId.success) throw new AppError(400, 'VALIDATION_ERROR', 'listId must be a uuid');
     const total = await prisma.customer.count({ where: { businessId: req.auth!.businessId } });
-    const reach = (await audience(req.auth!.businessId, days.data)).length;
+    const reach = (await audience(req.auth!.businessId, days.data, listId.data)).length;
     res.json({ success: true, data: { total, reach, optedOut: await prisma.customer.count({ where: { businessId: req.auth!.businessId, marketingOptOut: true } }) } });
   } catch (e) {
     next(e);
   }
 });
 
+// A campaign may only target one of the business's own lists.
+async function assertOwnList(businessId: string, listId: string | null | undefined) {
+  if (listId && !(await prisma.customerList.findFirst({ where: { id: listId, businessId } }))) {
+    throw new AppError(400, 'VALIDATION_ERROR', 'Invalid request', { listId: ['List not found'] });
+  }
+}
+
 campaignsRouter.post('/', validateBody(createSchema), async (req, res, next) => {
   try {
+    await assertOwnList(req.auth!.businessId, req.body.listId);
     const data = await prisma.campaign.create({ data: { ...req.body, businessId: req.auth!.businessId, createdById: req.auth!.userId } });
     logger.info({ event: 'campaign_created', businessId: data.businessId, userId: req.auth!.userId }, 'Campaign created');
     res.status(201).json({ success: true, data });
@@ -68,6 +79,7 @@ campaignsRouter.patch('/:id', validateBody(updateSchema), async (req, res, next)
   try {
     const id = parseId(req.params.id);
     const businessId = req.auth!.businessId;
+    await assertOwnList(businessId, req.body.listId);
     const { count } = await prisma.campaign.updateMany({ where: { id, businessId, status: 'DRAFT' }, data: req.body });
     if (!count) {
       if (await prisma.campaign.findFirst({ where: { id, businessId } })) throw conflict('Only a draft can be edited');

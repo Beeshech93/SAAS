@@ -20,6 +20,7 @@ import { messagesRouter } from './modules/messages/messages.routes';
 import { faqRouter } from './modules/faq/faq.routes';
 import { automationRouter } from './modules/automation/automation.routes';
 import { campaignsRouter } from './modules/campaigns/campaigns.routes';
+import { listsRouter } from './modules/lists/lists.routes';
 import { servicesRouter } from './modules/services/services.routes';
 
 export function createApp() {
@@ -55,6 +56,7 @@ export function createApp() {
   app.use('/api/faqs', faqRouter);
   app.use('/api/auto-replies', automationRouter);
   app.use('/api/campaigns', campaignsRouter);
+  app.use('/api/lists', listsRouter);
   app.use('/api/services', servicesRouter);
   app.use('/api/customers', customersRouter);
   app.use('/api/conversations', conversationsRouter);

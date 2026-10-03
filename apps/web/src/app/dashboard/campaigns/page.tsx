@@ -8,7 +8,7 @@ import { Button, ErrorAlert, Field, SelectField, Spinner } from '@/components/ui
 import { t } from '@/i18n';
 
 type Status = 'DRAFT' | 'SENDING' | 'COMPLETED' | 'CANCELLED';
-interface Campaign { id: string; name: string; message: string; recentDays: number | null; status: Status; totalCount: number; sentCount: number; failedCount: number; createdAt: string }
+interface Campaign { id: string; name: string; message: string; recentDays: number | null; listId?: string | null; status: Status; totalCount: number; sentCount: number; failedCount: number; createdAt: string }
 interface Recipient { id: string; phone: string; name: string | null; status: string; error: string | null }
 interface Detail { campaign: Campaign; recipients: Recipient[]; remaining: number }
 interface Batch { campaign: Campaign; remaining: number; blocked?: string }
@@ -57,22 +57,27 @@ export default function CampaignsPage() {
 
 function CreateForm({ onDone }: { onDone: (id?: string) => void | Promise<void> }) {
   const [days, setDays] = useState('');
+  const [listId, setListId] = useState('');
+  const { items: lists } = useList<{ id: string; name: string; memberCount: number }>('/api/lists');
   const [reach, setReach] = useState<Reach | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     let live = true;
-    api<Reach>(`/api/campaigns/audience${days ? `?recentDays=${days}` : ''}`).then((r) => live && setReach(r)).catch(() => live && setReach(null));
+    const q = new URLSearchParams();
+    if (days) q.set('recentDays', days);
+    if (listId) q.set('listId', listId);
+    api<Reach>(`/api/campaigns/audience${q.size ? `?${q}` : ''}`).then((r) => live && setReach(r)).catch(() => live && setReach(null));
     return () => { live = false; };
-  }, [days]);
+  }, [days, listId]);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     setBusy(true); setErr(null);
     try {
-      const c = await api<Campaign>('/api/campaigns', { method: 'POST', body: { name: String(f.get('name')).trim(), message: String(f.get('message')).trim(), recentDays: days ? Number(days) : null } });
+      const c = await api<Campaign>('/api/campaigns', { method: 'POST', body: { name: String(f.get('name')).trim(), message: String(f.get('message')).trim(), recentDays: days ? Number(days) : null, listId: listId || null } });
       await onDone(c.id);
     } catch (e2) { setErr(errorMessage(e2)); setBusy(false); }
   }
@@ -84,6 +89,10 @@ function CreateForm({ onDone }: { onDone: (id?: string) => void | Promise<void> 
         <label htmlFor="message" className="block text-sm font-medium">{t('campaigns.message')}</label>
         <textarea id="message" name="message" required maxLength={1000} rows={5} disabled={busy} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
       </div>
+      <SelectField id="list" label={t('campaigns.list')} value={listId} onChange={(e) => setListId(e.target.value)} disabled={busy}>
+        <option value="">{t('campaigns.listAll')}</option>
+        {lists?.map((l) => <option key={l.id} value={l.id}>{l.name} ({l.memberCount})</option>)}
+      </SelectField>
       <SelectField id="days" label={t('campaigns.audience')} value={days} onChange={(e) => setDays(e.target.value)} disabled={busy}>
         <option value="">{t('campaigns.audienceAll')}</option>
         {[7, 30, 90].map((d) => <option key={d} value={d}>{t('campaigns.audienceRecent', { days: String(d) })}</option>)}

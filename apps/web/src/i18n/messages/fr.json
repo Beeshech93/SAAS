@@ -204,6 +204,7 @@
     "whatsapp": "WhatsApp",
     "automation": "Réponses automatiques",
     "campaigns": "Campagnes",
+    "lists": "Listes",
     "settings": "Paramètres",
     "subscription": "Abonnement"
   },
@@ -384,6 +385,8 @@
     "message": "Message",
     "audience": "Audience",
     "audienceAll": "Tous les clients",
+    "list": "Liste de clients",
+    "listAll": "Aucune (tous les clients)",
     "audienceRecent": "Clients actifs ces {{days}} derniers jours",
     "reach": "{{count}} destinataire(s) sur {{total}} clients ({{optedOut}} désabonné(s))",
     "draft": "Brouillon",
@@ -403,6 +406,26 @@
     "failures": "Messages en échec",
     "caveat": "Avec l'API officielle Meta, un message libre n'est livré que si le client a écrit dans les dernières 24 h (sinon il faut un modèle approuvé, non géré ici). Avec Evolution API, l'envoi est libre mais envoyez par petits volumes.",
     "back": "← Retour"
+  },
+  "lists": {
+    "title": "Listes de clients",
+    "intro": "Créez des segments (VIP, clients du week-end…) pour cibler vos campagnes.",
+    "new": "Nouvelle liste",
+    "name": "Nom de la liste",
+    "empty": "Aucune liste pour le moment.",
+    "members": "{{count}} client(s)",
+    "back": "← Retour",
+    "rename": "Renommer",
+    "addPaste": "Ajouter des numéros",
+    "pasteHint": "Un contact par ligne : numéro, puis un nom optionnel (ex. +50937001234, Jean). Les numéros inconnus créent de nouveaux clients.",
+    "pasteAdd": "Ajouter à la liste",
+    "addExisting": "Ajouter des clients existants",
+    "addSelected": "Ajouter la sélection",
+    "none": "Aucun client dans cette liste.",
+    "remove": "Retirer",
+    "result": "{{added}} ajouté(s), {{already}} déjà présent(s), {{created}} nouveau(x) client(s), {{invalid}} numéro(s) invalide(s).",
+    "invalidList": "Numéros invalides : {{list}}",
+    "confirmDelete": "Supprimer cette liste ? Les clients ne sont pas supprimés."
   },
   "ai": {
     "unavailable": "L'assistant IA n'est pas encore configuré sur le serveur (AI_API_KEY manquante).",

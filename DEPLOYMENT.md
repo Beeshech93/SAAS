@@ -73,3 +73,7 @@ Set `REGISTRATION_ALLOWED_EMAILS` (comma-separated) to allow only those emails t
 - **Campaigns** (`/api/campaigns`, dashboard → Campagnes): the audience is snapshotted on start and sent in batches (`CAMPAIGN_BATCH_SIZE`, default 10, with `CAMPAIGN_SEND_DELAY_MS` pause, default 1000) by repeated `POST /:id/process` calls made by the dashboard page, so keep the page open until it finishes (use "Reprendre l'envoi" to continue). Each sent message counts toward the plan quota; sending pauses when the quota or subscription blocks it.
 - **Meta Cloud API limit**: free-form messages are only delivered inside the 24 h customer window; outside it Meta requires an approved template (not implemented). Evolution API has no such rule, but send small volumes to limit ban risk.
 - Migration: `20261003010000_campaigns_auto_replies`.
+
+## Customer lists (campaign segments)
+
+`/api/lists` (dashboard → Listes): named groups of customers. Members are added from existing customers or by pasting numbers (`phone[, name]` per line; unknown numbers create customers, invalid ones are reported). A campaign can target one list (`listId`), optionally also limited to customers active in the last N days; opted-out customers are always excluded. A list used by a draft/running campaign cannot be deleted. Migration: `20261003020000_customer_lists`.

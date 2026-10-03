@@ -103,6 +103,8 @@ export function createFakePrisma() {
   const autoReplyRule = table(() => ({ active: true, keywords: [], activeFrom: null, activeTo: null, priority: 0 }));
   const campaign = table(() => ({ status: 'DRAFT', recentDays: null, totalCount: 0, sentCount: 0, failedCount: 0, startedAt: null, completedAt: null }));
   const campaignRecipient = table(() => ({ status: 'PENDING', error: null, externalId: null, sentAt: null }));
+  const customerList = table();
+  const customerListMember = table();
   const invitation = table(() => ({ acceptedAt: null }));
   const plan = table(() => ({ currency: 'USD', active: true }));
   const subscription = table(() => ({ status: 'TRIALING', trialEndsAt: null, currentPeriodEnd: null }));
@@ -135,6 +137,8 @@ export function createFakePrisma() {
     invitation,
     whatsAppIntegration,
     autoReplyRule,
+    customerList,
+    customerListMember,
     campaign,
     campaignRecipient,
     customer,
