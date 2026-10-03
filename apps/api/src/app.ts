@@ -18,6 +18,8 @@ import { conversationsRouter } from './modules/conversations/conversations.route
 import { customersRouter } from './modules/customers/customers.routes';
 import { messagesRouter } from './modules/messages/messages.routes';
 import { faqRouter } from './modules/faq/faq.routes';
+import { automationRouter } from './modules/automation/automation.routes';
+import { campaignsRouter } from './modules/campaigns/campaigns.routes';
 import { servicesRouter } from './modules/services/services.routes';
 
 export function createApp() {
@@ -51,6 +53,8 @@ export function createApp() {
   app.use('/api/auth', authRouter);
   app.use('/api/business', businessRouter);
   app.use('/api/faqs', faqRouter);
+  app.use('/api/auto-replies', automationRouter);
+  app.use('/api/campaigns', campaignsRouter);
   app.use('/api/services', servicesRouter);
   app.use('/api/customers', customersRouter);
   app.use('/api/conversations', conversationsRouter);

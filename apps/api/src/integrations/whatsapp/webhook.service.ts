@@ -6,6 +6,8 @@ import { prisma } from '../../lib/prisma';
 import { findOrCreateConversation, addMessage } from '../../modules/conversations/conversations.service';
 import { findOrCreateCustomerByPhone } from '../../modules/customers/customers.service';
 import { getAutoResponder } from '../../modules/automation/responder';
+import { findAutoReply, optOutIntent } from '../../modules/automation/rules.service';
+import { canSend } from '../../modules/billing/billing.service';
 import { deliverText, markInboundAsRead } from './outbound';
 
 const media = z.object({
@@ -161,22 +163,43 @@ export async function processInbound(businessId: string, msg: Inbound, profileNa
   logger.info({ event: 'whatsapp_inbound', businessId, conversationId: conversation.id, type: msg.type }, 'Inbound message stored');
   void markInboundAsRead(businessId, msg.id);
 
-  // Who answers? AI only while it is ACTIVE for this conversation; otherwise a human does.
-  const responder = getAutoResponder();
-  if (conversation.aiActive && responder && stored.type === 'TEXT') {
-    const reply = await responder.respond({ businessId, conversationId: conversation.id, customerId: customer.id, text: stored.content });
-    if (reply) {
-      const result = await deliverText(businessId, phone, reply);
-      await addMessage({
-        businessId,
-        conversationId: conversation.id,
-        senderType: 'AI',
-        content: reply,
-        direction: 'OUTBOUND',
-        metadata: { delivery: result.delivery, ...(result.error ? { error: result.error } : {}) },
-        externalId: result.messageId ?? null,
-      });
+  // Marketing opt-out / opt-in keywords are handled first and never reach the rules or the AI.
+  const intent = stored.type === 'TEXT' ? optOutIntent(stored.content) : null;
+  if (intent) {
+    await prisma.customer.updateMany({ where: { id: customer.id, businessId }, data: { marketingOptOut: intent === 'STOP' } });
+    await sendAuto(businessId, conversation.id, phone, intent === 'STOP'
+      ? 'Vous ne recevrez plus nos messages promotionnels. Répondez START pour vous réabonner.'
+      : 'Merci, vous recevrez à nouveau nos messages.', { auto: 'optout', optOut: intent === 'STOP' });
+    return true;
+  }
+
+  // Who answers? Only while the conversation's automation is ACTIVE; otherwise a human does.
+  // Order: automatic-reply rules (keyword / away / welcome), then the AI.
+  if (conversation.aiActive && stored.type === 'TEXT') {
+    const hit = await findAutoReply({ businessId, conversationId: conversation.id, text: stored.content, customerName: customer.name });
+    if (hit) {
+      if ((await canSend(businessId)).ok) await sendAuto(businessId, conversation.id, phone, hit.reply, { auto: 'rule', ruleId: hit.ruleId });
+      return true;
+    }
+    const responder = getAutoResponder();
+    if (responder) {
+      const reply = await responder.respond({ businessId, conversationId: conversation.id, customerId: customer.id, text: stored.content });
+      if (reply) await sendAuto(businessId, conversation.id, phone, reply);
     }
   }
   return true;
+}
+
+/** Sends an automatic reply through the business's number and records it with its delivery result. */
+async function sendAuto(businessId: string, conversationId: string, phone: string, text: string, metadata: Record<string, unknown> = {}) {
+  const result = await deliverText(businessId, phone, text);
+  await addMessage({
+    businessId,
+    conversationId,
+    senderType: 'AI',
+    content: text,
+    direction: 'OUTBOUND',
+    metadata: { ...metadata, delivery: result.delivery, ...(result.error ? { error: result.error } : {}) } as Prisma.InputJsonValue,
+    externalId: result.messageId ?? null,
+  });
 }

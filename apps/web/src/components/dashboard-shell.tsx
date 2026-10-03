@@ -16,6 +16,8 @@ const NAV: { key: string; href?: string }[] = [
   { key: 'team', href: '/dashboard/team' },
   { key: 'analytics', href: '/dashboard/analytics' },
   { key: 'whatsapp', href: '/dashboard/whatsapp' },
+  { key: 'automation', href: '/dashboard/automation' },
+  { key: 'campaigns', href: '/dashboard/campaigns' },
   { key: 'settings', href: '/dashboard/settings' },
   { key: 'subscription', href: '/dashboard/subscription' },
 ];

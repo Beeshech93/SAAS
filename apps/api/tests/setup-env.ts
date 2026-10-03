@@ -6,3 +6,4 @@ process.env.RATE_LIMIT_AUTH_MAX = '1000';
 process.env.WHATSAPP_VERIFY_TOKEN = 'verify-token-for-tests';
 process.env.WHATSAPP_APP_SECRET = 'app-secret-for-tests';
 process.env.ENCRYPTION_KEY = Buffer.alloc(32, 7).toString('base64');
+process.env.CAMPAIGN_SEND_DELAY_MS = '0';

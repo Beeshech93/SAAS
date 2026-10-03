@@ -64,3 +64,11 @@ Needs `ENCRYPTION_KEY` (stores the apikey encrypted). No new environment variabl
 ## Restricting registration
 
 Set `REGISTRATION_ALLOWED_EMAILS` (comma-separated) to allow only those emails to create a new business via `/register`; others get 403. Empty/unset = open registration. Team members still join through invitations.
+
+## Automatic replies and campaigns
+
+- **Rules** (`/api/auto-replies`, dashboard → Réponses automatiques): KEYWORD, WELCOME (first message) and AWAY (hours in the business timezone; sent at most once per 12 h per conversation). Evaluated before the AI, only while the conversation's automation is active. `{{name}}` = first name.
+- **Opt-out**: a customer answering exactly STOP / ARRÊT / DÉSABONNER is excluded from campaigns (`Customer.marketingOptOut`); START opts back in. Both get a confirmation.
+- **Campaigns** (`/api/campaigns`, dashboard → Campagnes): the audience is snapshotted on start and sent in batches (`CAMPAIGN_BATCH_SIZE`, default 10, with `CAMPAIGN_SEND_DELAY_MS` pause, default 1000) by repeated `POST /:id/process` calls made by the dashboard page, so keep the page open until it finishes (use "Reprendre l'envoi" to continue). Each sent message counts toward the plan quota; sending pauses when the quota or subscription blocks it.
+- **Meta Cloud API limit**: free-form messages are only delivered inside the 24 h customer window; outside it Meta requires an approved template (not implemented). Evolution API has no such rule, but send small volumes to limit ban risk.
+- Migration: `20261003010000_campaigns_auto_replies`.

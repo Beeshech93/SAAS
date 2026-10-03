@@ -66,6 +66,27 @@ enum IntegrationStatus {
   DISABLED
 }
 
+enum AutoReplyTrigger {
+  KEYWORD // the message contains one of the keywords
+  WELCOME // first message of a conversation
+  AWAY // message received inside the activeFrom-activeTo window (business local time)
+}
+
+enum CampaignStatus {
+  DRAFT
+  SENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum RecipientStatus {
+  PENDING
+  SENDING
+  SENT
+  FAILED
+  SKIPPED
+}
+
 enum WhatsAppProviderType {
   CLOUD_API
   EVOLUTION
@@ -129,13 +150,15 @@ model Business {
   faqs     Faq[]
   services Service[]
 
-  customers     Customer[]
-  conversations Conversation[]
-  messages      Message[]
-  whatsapp      WhatsAppIntegration?
-  invitations   Invitation[]
-  subscription  Subscription?
-  usage         Usage[]
+  customers      Customer[]
+  conversations  Conversation[]
+  messages       Message[]
+  whatsapp       WhatsAppIntegration?
+  invitations    Invitation[]
+  subscription   Subscription?
+  usage          Usage[]
+  autoReplyRules AutoReplyRule[]
+  campaigns      Campaign[]
 }
 
 // A user can belong to several businesses; the role is per business.
@@ -206,15 +229,17 @@ model Service {
 
 // Phone is stored normalized (E.164 style, e.g. +50937001234) and is unique per business.
 model Customer {
-  id         String   @id @default(uuid()) @db.Uuid
-  businessId String   @db.Uuid
-  name       String?
-  phone      String
-  email      String?
-  country    String?
-  notes      String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id              String   @id @default(uuid()) @db.Uuid
+  businessId      String   @db.Uuid
+  name            String?
+  phone           String
+  email           String?
+  country         String?
+  notes           String?
+  // Set when the customer answers STOP (or an agent records the request). Campaigns skip them.
+  marketingOptOut Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   business      Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
   conversations Conversation[]
@@ -273,20 +298,20 @@ model Message {
 // One WhatsApp Business number per business. phoneNumberId is globally unique so an
 // incoming webhook maps to exactly one tenant. The access token is stored encrypted (AES-256-GCM).
 model WhatsAppIntegration {
-  id                 String            @id @default(uuid()) @db.Uuid
-  businessId         String            @unique @db.Uuid
-  phoneNumberId      String            @unique
+  id                 String               @id @default(uuid()) @db.Uuid
+  businessId         String               @unique @db.Uuid
+  phoneNumberId      String               @unique
   displayPhoneNumber String?
   accessTokenEnc     String
-  status             IntegrationStatus @default(ACTIVE)
+  status             IntegrationStatus    @default(ACTIVE)
   // EVOLUTION = a self-hosted Evolution API instance (accessTokenEnc holds its apikey;
   // phoneNumberId is a synthetic "evo:<instance>@<host>"; webhookSecret authenticates its webhook calls).
   provider           WhatsAppProviderType @default(CLOUD_API)
   baseUrl            String?
   instanceName       String?
   webhookSecret      String?
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime          @updatedAt
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
 
   business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 }
@@ -356,4 +381,69 @@ model Usage {
   business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@unique([businessId, period])
+}
+
+// Automatic replies evaluated before the AI: keyword answers, a welcome message, an away message.
+// Texts may use {{name}} (the customer's first name).
+model AutoReplyRule {
+  id         String           @id @default(uuid()) @db.Uuid
+  businessId String           @db.Uuid
+  name       String
+  trigger    AutoReplyTrigger
+  keywords   String[]         @default([])
+  reply      String
+  // "HH:mm" in the business timezone; required for AWAY, optional for WELCOME. May wrap midnight.
+  activeFrom String?
+  activeTo   String?
+  priority   Int              @default(0)
+  active     Boolean          @default(true)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, active])
+}
+
+// A broadcast message. Recipients are snapshotted when the campaign starts and sent in small batches.
+model Campaign {
+  id          String         @id @default(uuid()) @db.Uuid
+  businessId  String         @db.Uuid
+  name        String
+  message     String
+  // Audience: all customers who did not opt out; with recentDays, only those active in the last N days.
+  recentDays  Int?
+  status      CampaignStatus @default(DRAFT)
+  totalCount  Int            @default(0)
+  sentCount   Int            @default(0)
+  failedCount Int            @default(0)
+  createdById String?        @db.Uuid
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  business   Business            @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  recipients CampaignRecipient[]
+
+  @@index([businessId, createdAt])
+}
+
+model CampaignRecipient {
+  id         String          @id @default(uuid()) @db.Uuid
+  campaignId String          @db.Uuid
+  businessId String          @db.Uuid
+  customerId String          @db.Uuid
+  phone      String
+  name       String?
+  status     RecipientStatus @default(PENDING)
+  error      String?
+  externalId String?
+  sentAt     DateTime?
+  createdAt  DateTime        @default(now())
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, customerId])
+  @@index([campaignId, status])
 }

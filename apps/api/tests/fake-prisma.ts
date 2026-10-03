@@ -72,6 +72,10 @@ function table(defaults: () => Row = () => ({})) {
       }
       return take ? out.slice(0, take) : out;
     },
+    createMany: async ({ data }: { data: Row[] }) => {
+      for (const d of data) { clock = Math.max(Date.now(), clock + 1); rows.push({ id: randomUUID(), createdAt: new Date(clock), updatedAt: new Date(clock), ...defaults(), ...d }); }
+      return { count: data.length };
+    },
     count: async ({ where }: { where?: Row } = {}) => rows.filter((x) => matches(x, where)).length,
     deleteMany: async ({ where }: { where?: Row }) => {
       let count = 0;
@@ -92,10 +96,13 @@ export function createFakePrisma() {
   const businessMember = table();
   const refreshToken = table(() => ({ revokedAt: null }));
   const faq = table(() => ({ active: true }));
-  const customer = table();
+  const customer = table(() => ({ marketingOptOut: false }));
   const conversation = table(() => ({ status: 'OPEN', channel: 'WHATSAPP', aiActive: true, assignedToId: null, lastMessageAt: new Date() }));
   const message = table(() => ({ messageType: 'TEXT' }));
   const whatsAppIntegration = table(() => ({ status: 'ACTIVE', displayPhoneNumber: null, provider: 'CLOUD_API', baseUrl: null, instanceName: null, webhookSecret: null }));
+  const autoReplyRule = table(() => ({ active: true, keywords: [], activeFrom: null, activeTo: null, priority: 0 }));
+  const campaign = table(() => ({ status: 'DRAFT', recentDays: null, totalCount: 0, sentCount: 0, failedCount: 0, startedAt: null, completedAt: null }));
+  const campaignRecipient = table(() => ({ status: 'PENDING', error: null, externalId: null, sentAt: null }));
   const invitation = table(() => ({ acceptedAt: null }));
   const plan = table(() => ({ currency: 'USD', active: true }));
   const subscription = table(() => ({ status: 'TRIALING', trialEndsAt: null, currentPeriodEnd: null }));
@@ -127,6 +134,9 @@ export function createFakePrisma() {
     usage,
     invitation,
     whatsAppIntegration,
+    autoReplyRule,
+    campaign,
+    campaignRecipient,
     customer,
     conversation,
     message,
