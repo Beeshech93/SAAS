@@ -44,7 +44,19 @@ const schema = z.object({
   RATE_LIMIT_AUTH_MAX: z.coerce.number().int().positive().default(20),
 });
 
-const parsed = schema.safeParse(process.env);
+// An optional integration key must never take the whole API down: a malformed AI_API_KEY (empty,
+// truncated, wrapped in quotes) disables the assistant and says so, instead of aborting the boot.
+const raw: NodeJS.ProcessEnv = { ...process.env };
+if (raw.AI_API_KEY !== undefined) {
+  const key = raw.AI_API_KEY.trim().replace(/^(["'])(.*)\1$/, '$2').trim();
+  if (key.length >= 10) raw.AI_API_KEY = key;
+  else {
+    if (key) console.warn(`AI_API_KEY ignored: it is only ${key.length} characters long, so the assistant stays off.`);
+    delete raw.AI_API_KEY;
+  }
+}
+
+const parsed = schema.safeParse(raw);
 if (!parsed.success) {
   // Print only the field names/messages, never values.
   console.error('Invalid environment configuration:', parsed.error.flatten().fieldErrors);
