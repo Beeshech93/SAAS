@@ -1,6 +1,9 @@
+'use client';
+
 import Link from 'next/link';
 import { Pricing } from '@/components/landing/pricing';
-import { t, tr } from '@/i18n';
+import { LanguageSwitcher } from '@/components/language-switcher';
+import { useLocale } from '@/i18n';
 
 interface Item { title: string; text: string }
 const container = 'mx-auto max-w-6xl px-6';
@@ -24,25 +27,32 @@ function VerticalCard({ id, title, text, points }: { id: string; title: string; 
       <h3 className="text-xl font-semibold">{title}</h3>
       <p className="mt-3 text-slate-600">{text}</p>
       <ul className="mt-5 space-y-2 text-sm">
-        {points.map((p) => <li key={p} className="flex gap-2"><span className="text-brand-600" aria-hidden>✓</span>{p}</li>)}
+        {points?.map((p) => <li key={p} className="flex gap-2"><span className="text-brand-600" aria-hidden>✓</span>{p}</li>)}
       </ul>
     </article>
   );
 }
 
 export default function Landing() {
-  const steps = tr<Item[]>('landing.how.steps');
-  const features = tr<Item[]>('landing.features.items');
-  const faqs = tr<{ q: string; a: string }[]>('landing.faqSection.items');
-  const hotels = tr<{ title: string; text: string; points: string[] }>('landing.hotels');
-  const restos = tr<{ title: string; text: string; points: string[] }>('landing.restaurants');
+  const { t, tr } = useLocale();
+
+  const steps = tr<Item[]>('landing.how.steps') || [];
+  const features = tr<Item[]>('landing.features.items') || [];
+  const faqs = tr<{ q: string; a: string }[]>('landing.faqSection.items') || [];
+  const hotels = tr<{ title: string; text: string; points: string[] }>('landing.hotels') || { title: '', text: '', points: [] };
+  const restos = tr<{ title: string; text: string; points: string[] }>('landing.restaurants') || { title: '', text: '', points: [] };
 
   return (
     <>
-      <a href="#contenu" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:rounded focus:bg-white focus:px-3 focus:py-2">Aller au contenu</a>
+      <a href="#contenu" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:rounded focus:bg-white focus:px-3 focus:py-2">
+        {t('landing.nav.how')}
+      </a>
       <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/90 backdrop-blur">
         <div className={`${container} flex h-16 items-center justify-between`}>
-          <Link href="/" className="font-bold">WhatsApp Business Assistant</Link>
+          <Link href="/" className="font-bold flex items-center gap-2">
+            <span>💬</span>
+            <span>WhatsApp Business Assistant</span>
+          </Link>
           <nav aria-label="Navigation principale" className="hidden items-center gap-6 text-sm md:flex">
             <a href="#comment-ca-marche" className="hover:text-brand-700">{t('landing.nav.how')}</a>
             <a href="#fonctionnalites" className="hover:text-brand-700">{t('landing.nav.features')}</a>
@@ -50,6 +60,7 @@ export default function Landing() {
             <a href="#faq" className="hover:text-brand-700">{t('landing.nav.faq')}</a>
           </nav>
           <div className="flex items-center gap-3 text-sm">
+            <LanguageSwitcher theme="light" />
             <Link href="/login" className="font-medium hover:text-brand-700">{t('landing.nav.login')}</Link>
             <Link href="/register" className="hidden rounded-lg bg-brand-600 px-4 py-2 font-semibold text-white hover:bg-brand-700 sm:block">{t('landing.ctaStart')}</Link>
           </div>

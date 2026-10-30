@@ -63,5 +63,14 @@ GET (O/A) · GET `/invitations` (O/A) · POST `/invitations` `{email,role: ADMIN
 - `GET /api/subscription` (O) — plan, status, trial, limits, usage.
 - `POST /api/subscription/change-plan` (O) `{plan}` — **501 unless `BILLING_SELF_SERVICE=true`** (no payment provider yet).
 
+## Super Admin — `/api/admin` (Platform Super Admin only)
+- `GET /overview` — global metrics: total businesses, active/suspended, total users, customers, monthly message volume, WhatsApp providers, subscription breakdown, recent businesses.
+- `GET /businesses` — list businesses (`?search=`, `?status=ACTIVE|SUSPENDED`, `?page=`, `?limit=`) with stats & owner info.
+- `GET /businesses/:id` — deep dive into business data, WhatsApp configuration, team members, and monthly usage.
+- `PATCH /businesses/:id/status` — `{status: 'ACTIVE'|'SUSPENDED'}`.
+- `PATCH /businesses/:id/subscription` — `{planCode?, status?, extendTrialDays?}`.
+- `GET /users` — list users (`?search=`, `?isSuperAdmin=true|false`, `?page=`, `?limit=`) with business memberships.
+- `PATCH /users/:id/superadmin` — `{isSuperAdmin: boolean}` (self-demotion blocked).
+
 ## Health
 `GET /health`. All `/api` routes share a global limit of `RATE_LIMIT_API_PER_MIN` per IP (webhooks excluded).

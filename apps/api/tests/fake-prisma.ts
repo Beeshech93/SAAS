@@ -91,7 +91,7 @@ function table(defaults: () => Row = () => ({})) {
 }
 
 export function createFakePrisma() {
-  const user = table();
+  const user = table(() => ({ isSuperAdmin: false }));
   const business = table(() => ({ status: 'ACTIVE', language: 'fr', timezone: 'America/Port-au-Prince', aiEnabled: true, aiRules: null, onboardedAt: null }));
   const businessMember = table();
   const refreshToken = table(() => ({ revokedAt: null }));
@@ -111,28 +111,103 @@ export function createFakePrisma() {
   const usage = table(() => ({ messages: 0 }));
   const service = table(() => ({ available: true, currency: 'HTG', amenities: [] }));
 
-  // Emulate `include: { business, user }` on member lookups.
-  const withIncludes = async (m: Row | null, include?: Row) => {
+  // Emulate `include` relations on mock tables.
+  const withMemberIncludes = async (m: Row | null, include?: Row) => {
     if (!m || !include) return m;
     if (include.business) m.business = await business.findUnique({ where: { id: m.businessId } });
     if (include.user) m.user = await user.findUnique({ where: { id: m.userId } });
     return m;
   };
-  const member = {
-    ...businessMember,
-    findUnique: async (a: Row) => withIncludes(await businessMember.findUnique(a as any), a.include),
-    findFirst: async (a: Row) => withIncludes(await businessMember.findFirst(a as any), a.include),
+
+  const withSubIncludes = async (s: Row | null, include?: Row) => {
+    if (!s || !include) return s;
+    if (include.plan) s.plan = (await plan.findUnique({ where: { id: s.planId } })) ?? { code: 'STARTER', name: 'Starter' };
+    return s;
   };
 
+  const withBusinessIncludes = async (b: Row | null, include?: Row) => {
+    if (!b || !include) return b;
+    if (include.members) {
+      const ms = await businessMember.findMany({ where: { businessId: b.id } });
+      b.members = await Promise.all(ms.map((m) => withMemberIncludes(m, { user: true })));
+    }
+    if (include.subscription) {
+      const s = await subscription.findUnique({ where: { businessId: b.id } });
+      b.subscription = s ? await withSubIncludes(s, { plan: true }) : null;
+    }
+    if (include.whatsapp) {
+      b.whatsapp = await whatsAppIntegration.findUnique({ where: { businessId: b.id } });
+    }
+    if (include.usage) {
+      b.usage = await usage.findMany({ where: { businessId: b.id } });
+    }
+    if (include._count) {
+      b._count = {
+        customers: await customer.count({ where: { businessId: b.id } }),
+        conversations: await conversation.count({ where: { businessId: b.id } }),
+        messages: await message.count({ where: { businessId: b.id } }),
+        members: await businessMember.count({ where: { businessId: b.id } }),
+        faqs: await faq.count({ where: { businessId: b.id } }),
+        services: await service.count({ where: { businessId: b.id } }),
+        autoReplyRules: await autoReplyRule.count({ where: { businessId: b.id } }),
+        campaigns: await campaign.count({ where: { businessId: b.id } }),
+      };
+    }
+    return b;
+  };
+
+  const member = {
+    ...businessMember,
+    findUnique: async (a: Row) => withMemberIncludes(await businessMember.findUnique(a as any), a.include),
+    findFirst: async (a: Row) => withMemberIncludes(await businessMember.findFirst(a as any), a.include),
+  };
+
+  const enhancedBusiness = {
+    ...business,
+    findUnique: async (a: Row) => withBusinessIncludes(await business.findUnique(a as any), a.include),
+    findFirst: async (a: Row) => withBusinessIncludes(await business.findFirst(a as any), a.include),
+    findMany: async (a: Row = {}) => {
+      const list = await business.findMany(a as any);
+      return Promise.all(list.map((b) => withBusinessIncludes(b, a.include)));
+    },
+  };
+
+  const enhancedSubscription = {
+    ...subscription,
+    findUnique: async (a: Row) => withSubIncludes(await subscription.findUnique(a as any), a.include),
+    findMany: async (a: Row = {}) => {
+      const list = await subscription.findMany(a as any);
+      return Promise.all(list.map((s) => withSubIncludes(s, a.include)));
+    },
+  };
+
+  const enhancedUser = {
+    ...user,
+    findMany: async (a: Row = {}) => {
+      const list = await user.findMany(a as any);
+      return Promise.all(
+        list.map(async (u) => {
+          if (a.select?.memberships) {
+            const ms = await businessMember.findMany({ where: { userId: u.id } });
+            u.memberships = await Promise.all(ms.map((m) => withMemberIncludes(m, { business: true })));
+          }
+          return u;
+        }),
+      );
+    },
+  };
+
+  const auditLog = table();
+
   const fake: Row = {
-    user,
-    business,
+    user: enhancedUser,
+    business: enhancedBusiness,
     businessMember: member,
     refreshToken,
     faq,
     service,
     plan,
-    subscription,
+    subscription: enhancedSubscription,
     usage,
     invitation,
     whatsAppIntegration,
@@ -144,6 +219,7 @@ export function createFakePrisma() {
     customer,
     conversation,
     message,
+    auditLog,
     $transaction: async (fn: (tx: Row) => Promise<unknown>) => fn(fake),
   };
   return fake;

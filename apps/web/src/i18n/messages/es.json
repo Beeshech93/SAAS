@@ -1,0 +1,637 @@
+{
+  "common": {
+    "loading": "Cargando…",
+    "error": "Ha ocurrido un error. Por favor, inténtalo de nuevo.",
+    "network": "No se puede conectar con el servidor. Verifica tu conexión.",
+    "logout": "Cerrar sesión",
+    "save": "Guardar",
+    "saved": "Cambios guardados.",
+    "cancel": "Cancelar",
+    "edit": "Modificar",
+    "delete": "Eliminar",
+    "add": "Agregar",
+    "confirmDelete": "¿Eliminar este elemento?",
+    "readOnly": "Tienes acceso de solo lectura.",
+    "soon": "Próximamente",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "landing": {
+    "title": "Automatiza tu atención al cliente en WhatsApp.",
+    "subtitle": "Responde más rápido a tus clientes, automatiza consultas repetitivas y deja que tu equipo se concentre en lo importante.",
+    "ctaStart": "Comenzar gratis",
+    "ctaLogin": "Iniciar sesión",
+    "nav": {
+      "how": "Cómo funciona",
+      "features": "Funcionalidades",
+      "pricing": "Precios",
+      "faq": "Preguntas frecuentes",
+      "login": "Iniciar sesión"
+    },
+    "ctaDemo": "Ver demostración",
+    "trialNote": "14 días de prueba gratis, sin tarjeta de crédito.",
+    "demo": {
+      "label": "Ejemplo de conversación",
+      "customer": "Cliente",
+      "assistant": "Asistente",
+      "c1": "Hola, ¿a qué hora es el check-in?",
+      "a1": "¡Hola! El check-in comienza a las 15:00.",
+      "c2": "¿Pueden reservarme una habitación doble?",
+      "a2": "Voy a transferir su solicitud a nuestro equipo, le responderemos en breve.",
+      "note": "Ilustración: el asistente responde únicamente con la información que tú configures y transfiere el resto a tu equipo."
+    },
+    "how": {
+      "title": "Cómo funciona",
+      "steps": [
+        {
+          "title": "Configura tu negocio",
+          "text": "Añade tu información, tus servicios, habitaciones o menú y preguntas frecuentes."
+        },
+        {
+          "title": "Conecta tu WhatsApp Business",
+          "text": "Vincula tu número mediante la API oficial de WhatsApp. Tus clientes te siguen escribiendo con total normalidad."
+        },
+        {
+          "title": "El asistente responde, tu equipo mantiene el control",
+          "text": "Las preguntas sencillas reciben respuesta automática; el resto se transfiere a un humano con todo el historial."
+        }
+      ]
+    },
+    "features": {
+      "title": "Funcionalidades",
+      "items": [
+        {
+          "title": "Respuestas basadas en tu información",
+          "text": "El asistente no inventa precios, disponibilidad ni políticas: sin información, transfiere a tu equipo."
+        },
+        {
+          "title": "Bandeja de entrada compartida",
+          "text": "Todas las conversaciones de WhatsApp en un solo lugar, con estados y asignación a miembros del equipo."
+        },
+        {
+          "title": "Transferencia a un humano",
+          "text": "¿Un cliente solicita hablar con una persona? La conversación se transfiere y la IA se pausa automáticamente."
+        },
+        {
+          "title": "Fichas de clientes",
+          "text": "Cada número se convierte en un cliente con su historial completo y notas personalizadas."
+        },
+        {
+          "title": "Estadísticas en tiempo real",
+          "text": "Conversaciones, mensajes y tiempos de primera respuesta disponibles de un vistazo."
+        },
+        {
+          "title": "Equipo y roles",
+          "text": "Propietario, administrador, agente: cada usuario accede y gestiona lo que le corresponde."
+        }
+      ]
+    },
+    "hotels": {
+      "title": "Para hoteles",
+      "text": "Muestra tus habitaciones, tarifas y comodidades, responde dudas sobre horarios, desayuno o ubicación, y transfiere las reservas a tu recepción.",
+      "points": [
+        "Habitaciones con capacidad, comodidades y precios",
+        "Preguntas frecuentes sobre horarios y servicios",
+        "Solicitudes de reserva derivadas directamente a tu equipo"
+      ]
+    },
+    "restaurants": {
+      "title": "Para restaurantes",
+      "text": "Comparte tu carta, horarios y condiciones de entrega, y deja que el asistente resuelva dudas frecuentes mientras tu equipo atiende en sala.",
+      "points": [
+        "Menú por categorías con precios actualizados",
+        "Horarios, ubicación e información práctica",
+        "Pedidos y reservas canalizados a tu equipo"
+      ]
+    },
+    "pricing": {
+      "title": "Precios",
+      "subtitle": "Comienza con una prueba gratuita de 14 días. Cambia de plan cuando quieras.",
+      "loading": "Cargando precios…",
+      "error": "Los precios no están disponibles en este momento.",
+      "popular": "Más popular",
+      "start": "Comenzar gratis"
+    },
+    "faqSection": {
+      "title": "Preguntas frecuentes",
+      "items": [
+        {
+          "q": "¿Utilizan la API oficial de WhatsApp?",
+          "a": "Sí. La aplicación utiliza exclusivamente la API oficial de WhatsApp Business de Meta, a través de tu propia cuenta y número."
+        },
+        {
+          "q": "¿Puede equivocarse el asistente?",
+          "a": "Está diseñado para responder únicamente con la información que configures y para transferir a tu equipo ante cualquier duda. Puedes probarlo y actualizar tus FAQ en cualquier momento."
+        },
+        {
+          "q": "¿Mis datos están aislados de otras empresas?",
+          "a": "Sí. Cada negocio cuenta con su propio entorno seguro y aislado: clientes, conversaciones, servicios y configuraciones."
+        },
+        {
+          "q": "¿Puede mi equipo intervenir en una conversación?",
+          "a": "Sí. Un agente puede tomar el control en cualquier momento; el asistente se pausará hasta que decidas reactivarlo."
+        },
+        {
+          "q": "¿Se requiere tarjeta de crédito para la prueba?",
+          "a": "No. La prueba de 14 días no solicita ningún método de pago."
+        }
+      ]
+    },
+    "final": {
+      "title": "¿Listo para ahorrar tiempo en WhatsApp?",
+      "text": "Crea tu espacio de trabajo en solo unos minutos."
+    },
+    "footer": {
+      "rights": "Todos los derechos reservados.",
+      "tagline": "Atención al cliente inteligente por WhatsApp para empresas."
+    }
+  },
+  "auth": {
+    "loginTitle": "Iniciar sesión",
+    "registerTitle": "Crear tu cuenta",
+    "name": "Tu nombre",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "passwordHint": "Mínimo 10 caracteres, con al menos una letra y un número.",
+    "businessName": "Nombre de la empresa",
+    "businessType": "Tipo de empresa",
+    "submitLogin": "Iniciar sesión",
+    "submitRegister": "Crear mi cuenta",
+    "submitting": "Por favor, espera…",
+    "noAccount": "¿No tienes cuenta todavía?",
+    "haveAccount": "¿Ya tienes una cuenta?",
+    "errors": {
+      "UNAUTHORIZED": "Correo electrónico o contraseña incorrectos.",
+      "CONFLICT": "Este registro ya existe (correo, número de WhatsApp o teléfono en uso).",
+      "VALIDATION_ERROR": "Algunos datos no son válidos. Revisa el formulario.",
+      "RATE_LIMITED": "Demasiados intentos. Inténtalo de nuevo en unos minutos.",
+      "FORBIDDEN": "Acceso denegado.",
+      "NOT_FOUND": "Elemento no encontrado.",
+      "NOT_IMPLEMENTED": "El pago en línea estará disponible próximamente."
+    }
+  },
+  "businessTypes": {
+    "HOTEL": "Hotel",
+    "RESTAURANT": "Restaurante",
+    "OTHER": "Otro"
+  },
+  "dashboard": {
+    "greeting": "Hola, {{businessName}}",
+    "placeholder": "Tu espacio ha sido creado. Las conversaciones, clientes, servicios y preguntas frecuentes se configurarán en los siguientes pasos.",
+    "role": {
+      "OWNER": "Propietario",
+      "ADMIN": "Administrador",
+      "AGENT": "Agente"
+    },
+    "recent": "Conversaciones recientes",
+    "noRecent": "No hay conversaciones por el momento.",
+    "seeAll": "Ver todas",
+    "stats": {
+      "conversations": "Conversaciones",
+      "customers": "Clientes",
+      "resolved": "Resueltas",
+      "pending": "Pendientes"
+    }
+  },
+  "nav": {
+    "dashboard": "Panel de control",
+    "conversations": "Conversaciones",
+    "customers": "Clientes",
+    "services": "Servicios",
+    "faq": "Preguntas frecuentes",
+    "team": "Equipo",
+    "analytics": "Estadísticas",
+    "whatsapp": "WhatsApp",
+    "automation": "Respuestas automáticas",
+    "campaigns": "Campañas",
+    "lists": "Listas",
+    "settings": "Configuración",
+    "subscription": "Suscripción"
+  },
+  "settings": {
+    "title": "Configuración de la empresa",
+    "name": "Nombre",
+    "type": "Tipo",
+    "description": "Descripción",
+    "address": "Dirección",
+    "phone": "Teléfono",
+    "email": "Correo de contacto",
+    "website": "Sitio web",
+    "timezone": "Zona horaria",
+    "language": "Idioma",
+    "ownerOnly": "Solo el propietario puede modificar esta información.",
+    "languages": {
+      "fr": "Français",
+      "es": "Español",
+      "en": "English",
+      "ht": "Kreyòl ayisyen"
+    },
+    "aiTitle": "Asistente IA",
+    "aiEnabled": "Activar respuestas automáticas del asistente",
+    "aiRules": "Reglas del negocio (opcional)",
+    "aiRulesHint": "Información adicional que el asistente puede utilizar: política de cancelación, mascotas, métodos de pago… El asistente no inventará nada fuera de estas reglas, tus FAQ y tus servicios."
+  },
+  "faq": {
+    "title": "Preguntas frecuentes",
+    "intro": "El asistente responderá únicamente a partir de estas respuestas.",
+    "question": "Pregunta",
+    "answer": "Respuesta",
+    "active": "Activa",
+    "empty": "No hay preguntas por el momento. Agrega tu primera pregunta, por ejemplo: «¿A qué hora es el check-in?»",
+    "new": "Nueva pregunta",
+    "inactive": "Desactivada"
+  },
+  "services": {
+    "title": "Servicios",
+    "intro": "Habitaciones, platos o servicios que el asistente puede presentar a tus clientes.",
+    "empty": "No hay servicios por el momento. Agrega tu primera habitación, plato o servicio.",
+    "new": "Nuevo servicio",
+    "name": "Nombre",
+    "kind": "Tipo",
+    "category": "Categoría",
+    "description": "Descripción",
+    "price": "Precio",
+    "currency": "Moneda",
+    "capacity": "Capacidad (personas)",
+    "amenities": "Comodidades / Equipamiento (separados por comas)",
+    "available": "Disponible",
+    "unavailable": "No disponible",
+    "types": {
+      "ROOM": "Habitación",
+      "MENU_ITEM": "Plato / Bebida",
+      "SERVICE": "Servicio"
+    },
+    "persons": "pers."
+  },
+  "customers": {
+    "title": "Clientes",
+    "intro": "Los clientes se registran automáticamente en su primer mensaje de WhatsApp, o manualmente aquí.",
+    "new": "Nuevo cliente",
+    "name": "Nombre",
+    "phone": "Teléfono WhatsApp",
+    "phoneHint": "Con el código de país, por ejemplo +509 3700 1234 o +1 555 123 4567.",
+    "email": "Correo electrónico",
+    "country": "País",
+    "notes": "Notas",
+    "search": "Buscar por nombre o número",
+    "empty": "No hay clientes registrados por el momento.",
+    "noResult": "No se encontraron resultados.",
+    "startConversation": "Iniciar conversación",
+    "unnamed": "Sin nombre"
+  },
+  "inbox": {
+    "title": "Conversaciones",
+    "empty": "No hay conversaciones por el momento. Aparecerán aquí en cuanto un cliente te escriba por WhatsApp.",
+    "select": "Selecciona una conversación.",
+    "noMessages": "No hay mensajes en esta conversación.",
+    "write": "Escribe un mensaje…",
+    "send": "Enviar",
+    "filterAll": "Todas",
+    "status": {
+      "OPEN": "Abierta",
+      "PENDING": "Pendiente",
+      "RESOLVED": "Resuelta",
+      "CLOSED": "Cerrada"
+    },
+    "ai": "IA activa",
+    "aiPaused": "IA en pausa",
+    "human": "Humano",
+    "take": "Tomar conversación",
+    "giveBack": "Devolver a la IA",
+    "assigned": "Asignada a un agente",
+    "unassigned": "Sin asignar",
+    "sender": {
+      "CUSTOMER": "Cliente",
+      "AI": "Asistente",
+      "AGENT": "Agente",
+      "SYSTEM": "Sistema"
+    },
+    "back": "Volver",
+    "notSent": "No enviado (WhatsApp desconectado)",
+    "failed": "Error al enviar",
+    "handoffNote": "Conversación transferida al equipo.",
+    "assignTo": "Asignar a",
+    "unassignedOption": "Sin asignar"
+  },
+  "whatsapp": {
+    "title": "Conexión de WhatsApp",
+    "intro": "Conecta el número de WhatsApp Business de tu empresa (API oficial WhatsApp Cloud de Meta o Evolution API).",
+    "status": "Estado",
+    "connected": "Conectado",
+    "notConnected": "No conectado",
+    "disabled": "Desactivado",
+    "webhookTitle": "URL del webhook",
+    "webhookHelp": "En la consola de Meta, pega esta URL como «URL de devolución de llamada» y utiliza el token de verificación configurado en el servidor (WHATSAPP_VERIFY_TOKEN). Suscríbete al campo «messages».",
+    "webhookMissing": "El servidor aún no está configurado para WhatsApp (faltan WHATSAPP_VERIFY_TOKEN / WHATSAPP_APP_SECRET).",
+    "phoneNumberId": "Identificador del número de teléfono (Phone number ID)",
+    "displayPhone": "Número visible (opcional)",
+    "token": "Token de acceso permanente",
+    "tokenHint": "Almacenado de forma cifrada. Nunca volverá a mostrarse.",
+    "enabled": "Activar recepción y envío",
+    "save": "Guardar conexión",
+    "disconnect": "Desconectar",
+    "confirmDisconnect": "¿Desconectar WhatsApp? Ya no se recibirán mensajes.",
+    "ownerOnly": "Solo el propietario puede modificar la conexión de WhatsApp.",
+    "provider": "Tipo de conexión",
+    "providerCloud": "API oficial de WhatsApp Cloud (Meta)",
+    "providerEvolution": "Evolution API (Auto-hospedada)",
+    "evoBaseUrl": "URL del servidor Evolution",
+    "evoBaseUrlHint": "Ej. https://evolution.midominio.com",
+    "evoInstance": "Nombre de la instancia",
+    "evoApiKey": "Clave de API (apikey)",
+    "evoApiKeyKeep": "Dejar en blanco para conservar la clave actual. Se guarda cifrada.",
+    "evoWebhookHelp": "El webhook se registra automáticamente en Evolution al guardar. Esta URL es secreta: no la compartas.",
+    "evoState": "Estado de la sesión de WhatsApp",
+    "evoWebhookOk": "Webhook registrado en Evolution.",
+    "evoCreate": "Crear la instancia en el servidor",
+    "evoCreateHint": "Marca si la instancia aún no existe: ingresa entonces la clave de API global de Evolution. Solo se conservará la clave propia de la instancia.",
+    "qrTitle": "Conexión mediante código QR",
+    "qrIntro": "Abre WhatsApp en el teléfono del negocio → Dispositivos vinculados → Vincular un dispositivo, y escanea este código.",
+    "qrGenerate": "Mostrar código QR",
+    "qrRefresh": "Actualizar QR",
+    "qrWaiting": "Esperando escaneo… el código se actualiza automáticamente.",
+    "qrConnected": "WhatsApp está conectado ✓",
+    "qrPairing": "O ingresa este código de emparejamiento:",
+    "qrWarning": "Este código da acceso a tu cuenta de WhatsApp: no lo compartas con nadie."
+  },
+  "automation": {
+    "title": "Respuestas automáticas",
+    "intro": "Estas reglas responden antes que el asistente IA, siempre que ningún miembro del equipo haya tomado la conversación. Usa {{name}} para el nombre del cliente.",
+    "new": "Nueva regla",
+    "empty": "No hay reglas por el momento.",
+    "name": "Nombre de la regla",
+    "trigger": "Desencadenante",
+    "KEYWORD": "Palabra clave",
+    "WELCOME": "Mensaje de bienvenida (primer mensaje)",
+    "AWAY": "Mensaje de ausencia (por horario)",
+    "keywords": "Palabras clave (separadas por comas)",
+    "keywordsHint": "La palabra debe aparecer completa, sin distinción de mayúsculas o tildes.",
+    "reply": "Respuesta enviada",
+    "from": "Desde (hora local)",
+    "to": "Hasta (hora local)",
+    "hoursHint": "Hora local de la empresa. Puede cruzar la medianoche (ej. 18:00 → 07:00).",
+    "priority": "Prioridad (0-100)",
+    "active": "Activa",
+    "inactive": "Inactiva",
+    "order": "Orden: palabra clave, luego ausencia, luego bienvenida. El mensaje de ausencia solo se envía una vez cada 12 h por conversación.",
+    "stopNote": "Los clientes que responden STOP quedan excluidos de las campañas (START para volver a suscribirse)."
+  },
+  "campaigns": {
+    "title": "Campañas",
+    "intro": "Envía mensajes a tus clientes. Aquellos que hayan respondido STOP quedan excluidos. Usa {{name}} para el nombre de pila.",
+    "new": "Nueva campaña",
+    "empty": "No hay campañas por el momento.",
+    "name": "Nombre de la campaña",
+    "message": "Mensaje",
+    "audience": "Audiencia",
+    "audienceAll": "Todos los clientes",
+    "list": "Lista de clientes",
+    "listAll": "Ninguna (todos los clientes)",
+    "audienceRecent": "Clientes activos en los últimos {{days}} días",
+    "reach": "{{count}} destinatario(s) de {{total}} clientes ({{optedOut}} desuscrito(s))",
+    "draft": "Borrador",
+    "sending": "En curso",
+    "completed": "Completada",
+    "cancelled": "Cancelada",
+    "start": "Iniciar envío",
+    "confirmStart": "¿Enviar esta campaña ahora? Cada mensaje cuenta en tu cuota mensual.",
+    "resume": "Reanudar envío",
+    "cancel": "Cancelar",
+    "confirmCancel": "¿Cancelar la campaña? Los mensajes restantes no se enviarán.",
+    "progress": "{{sent}} enviado(s) · {{failed}} fallido(s) · {{total}} en total",
+    "running": "Envío en curso… mantén esta página abierta.",
+    "blockedMESSAGE_LIMIT_REACHED": "Límite de mensajes del plan alcanzado: el envío está pausado.",
+    "blockedSUBSCRIPTION_INACTIVE": "Suscripción inactiva: el envío está pausado.",
+    "blockedWHATSAPP_NOT_CONNECTED": "WhatsApp no está conectado: el envío está pausado.",
+    "failures": "Mensajes fallidos",
+    "caveat": "Con la API oficial de Meta, un mensaje libre solo se entrega si el cliente escribió en las últimas 24 h (de lo contrario requiere plantilla aprobada). Con Evolution API el envío es libre, pero envía en volúmenes moderados.",
+    "back": "← Volver"
+  },
+  "lists": {
+    "title": "Listas de clientes",
+    "intro": "Crea segmentos (VIP, clientes de fin de semana…) para dirigir tus campañas.",
+    "new": "Nueva lista",
+    "name": "Nombre de la lista",
+    "empty": "No hay listas por el momento.",
+    "members": "{{count}} cliente(s)",
+    "back": "← Volver",
+    "rename": "Renombrar",
+    "addPaste": "Agregar números",
+    "pasteHint": "Un contacto por línea: número, luego nombre opcional (ej. +50937001234, Juan). Los números nuevos crearán clientes automáticamente.",
+    "pasteAdd": "Agregar a la lista",
+    "addExisting": "Agregar clientes existentes",
+    "addSelected": "Agregar seleccionados",
+    "none": "No hay clientes en esta lista.",
+    "remove": "Quitar",
+    "result": "{{added}} añadido(s), {{already}} ya presente(s), {{created}} nuevo(s) cliente(s), {{invalid}} número(s) no válido(s).",
+    "invalidList": "Números no válidos: {{list}}",
+    "confirmDelete": "¿Eliminar esta lista? Los clientes no serán eliminados.",
+    "import": "Importar contactos",
+    "modeFile": "Archivo",
+    "modePaste": "Pegar texto",
+    "modeSegment": "Desde mis clientes",
+    "fileHelp": "CSV, Excel (.xlsx), contactos del teléfono (.vcf) o texto. El archivo se procesa en tu navegador; solo se envían los números y nombres.",
+    "fileColumns": "Columnas reconocidas: teléfono / tel / móvil / whatsapp / número y nombre / apellido (encabezado opcional).",
+    "countryCode": "Código de país por defecto",
+    "countryCodeHint": "Se agrega a números locales (ej. 509). Los números con + o 00 no se modifican.",
+    "previewTitle": "Vista previa",
+    "previewSummary": "{{valid}} contacto(s) válido(s) de {{total}} fila(s) · {{dups}} duplicado(s) · {{invalid}} no válido(s)",
+    "previewInvalid": "Números no válidos: {{list}}",
+    "previewNone": "No se encontraron números válidos.",
+    "importNow": "Importar {{count}} contacto(s)",
+    "importing": "Importando… {{done}}/{{total}}",
+    "fileError": "No se pudo leer este archivo.",
+    "fileTooBig": "Archivo demasiado grande (máximo 5 MB).",
+    "tooMany": "Máximo 5.000 contactos por importación.",
+    "segAll": "Todos mis clientes",
+    "segRecent": "Clientes activos en los últimos {{days}} días",
+    "segList": "Copiar de otra lista: {{name}}",
+    "segAdd": "Agregar a esta lista"
+  },
+  "ai": {
+    "unavailable": "El asistente IA aún no está configurado en el servidor (falta AI_API_KEY).",
+    "previewTitle": "Probar el asistente",
+    "previewHelp": "Simulación: nada se guarda ni se envía por WhatsApp. Guarda primero tus cambios.",
+    "placeholder": "Escribe como si fueras un cliente…",
+    "send": "Probar",
+    "you": "Cliente",
+    "assistant": "Asistente",
+    "actions": {
+      "answer": "",
+      "no_info": "→ transferido al equipo (información no disponible)",
+      "handoff": "→ transferido al equipo",
+      "blocked": "→ mensaje bloqueado por protección",
+      "disabled": "→ asistente desactivado",
+      "error": "→ error del servicio de IA"
+    }
+  },
+  "analytics": {
+    "title": "Estadísticas",
+    "intro": "Actividad de tu asistente y de tu equipo de atención.",
+    "conversations": "Conversaciones",
+    "total": "Total",
+    "open": "Abiertas",
+    "pending": "Pendientes",
+    "resolved": "Resueltas",
+    "closed": "Cerradas",
+    "customers": "Clientes",
+    "messages": "Mensajes",
+    "received": "Recibidos",
+    "sent": "Enviados (IA + equipo)",
+    "byAI": "Enviados por la IA",
+    "byAgent": "Enviados por el equipo",
+    "firstResponse": "Tiempo de primera respuesta (30 días)",
+    "average": "Promedio",
+    "ai": "IA",
+    "agent": "Equipo",
+    "noData": "Aún no hay suficientes datos registrados.",
+    "sample": "{{n}} conversación(es) medida(s)",
+    "daily": "Mensajes de los últimos 7 días",
+    "legendIn": "Recibidos",
+    "legendOut": "Enviados",
+    "seconds": "{{n}} s",
+    "minutes": "{{n}} min",
+    "hours": "{{n}} h",
+    "forbidden": "Las estadísticas están reservadas a propietarios y administradores."
+  },
+  "team": {
+    "title": "Equipo",
+    "intro": "Invita a tus colaboradores. Cada uno creará su propia contraseña de acceso.",
+    "members": "Miembros",
+    "invitations": "Invitaciones pendientes",
+    "invite": "Invitar a un colaborador",
+    "email": "Correo electrónico",
+    "role": "Rol",
+    "send": "Crear invitación",
+    "linkReady": "Invitación creada. Copia este enlace y envíaselo a la persona (válido por 7 días, se muestra solo una vez):",
+    "copy": "Copiar enlace",
+    "copied": "Enlace copiado",
+    "remove": "Quitar",
+    "revoke": "Revocar",
+    "confirmRemove": "¿Quitar a esta persona del equipo? Sus conversaciones se devolverán a la IA.",
+    "expires": "expira el {{date}}",
+    "you": "tú",
+    "noInvites": "No hay invitaciones pendientes.",
+    "roles": {
+      "OWNER": "Propietario",
+      "ADMIN": "Administrador",
+      "AGENT": "Agente"
+    },
+    "ownerOnly": "Solo el propietario puede invitar o modificar miembros del equipo."
+  },
+  "invite": {
+    "title": "Unirse a {{businessName}}",
+    "intro": "Has sido invitado con el rol: {{role}}.",
+    "invalid": "Esta invitación no es válida o ha caducado. Solicita una nueva al propietario.",
+    "submit": "Crear mi cuenta"
+  },
+  "limits": {
+    "SUBSCRIPTION_INACTIVE": "Tu suscripción no está activa. Actualiza a un plan de pago para continuar enviando mensajes.",
+    "MESSAGE_LIMIT_REACHED": "Has alcanzado el límite mensual de mensajes de tu plan.",
+    "USER_LIMIT_REACHED": "Has alcanzado el límite de usuarios de tu plan.",
+    "FEATURE_NOT_IN_PLAN": "Esta funcionalidad no está incluida en tu plan actual.",
+    "default": "Límite del plan alcanzado."
+  },
+  "subscription": {
+    "title": "Suscripción",
+    "intro": "Tu plan actual, consumo acumulado y planes disponibles.",
+    "current": "Plan actual",
+    "status": {
+      "TRIALING": "Periodo de prueba",
+      "ACTIVE": "Activo",
+      "PAST_DUE": "Pago pendiente",
+      "CANCELED": "Cancelado",
+      "EXPIRED": "Expirado"
+    },
+    "trialEnds": "La prueba finaliza el {{date}}",
+    "inactive": "Tu suscripción no está activa: el asistente y el envío de mensajes están suspendidos. Los mensajes recibidos seguirán guardándose.",
+    "usage": "Consumo del mes",
+    "messages": "Mensajes enviados (IA + equipo)",
+    "users": "Usuarios (miembros + invitaciones)",
+    "plans": "Planes",
+    "perMonth": "/ mes",
+    "messagesLimit": "{{n}} mensajes / mes",
+    "usersLimit": "{{n}} usuarios",
+    "choose": "Elegir este plan",
+    "currentBadge": "Plan actual",
+    "paymentsSoon": "El pago en línea estará disponible muy pronto. Mientras tanto, contáctanos para cambiar de plan.",
+    "changed": "Plan actualizado con éxito.",
+    "features": {
+      "ai": "Asistente IA",
+      "analytics": "Estadísticas",
+      "customBranding": "Personalización",
+      "prioritySupport": "Soporte prioritario"
+    },
+    "ownerOnly": "Solo el propietario puede gestionar la suscripción."
+  },
+  "onboarding": {
+    "title": "Configuremos tu espacio",
+    "skip": "Omitir por ahora",
+    "stepOf": "Paso {{n}} de {{total}}",
+    "next": "Continuar",
+    "back": "Atrás",
+    "saving": "Guardando…",
+    "steps": [
+      "Empresa",
+      "Tipo",
+      "Información",
+      "FAQ y servicios",
+      "WhatsApp"
+    ],
+    "s1": {
+      "title": "¿Cómo se llama tu empresa?",
+      "hint": "Este nombre será utilizado por el asistente para presentarse ante tus clientes."
+    },
+    "s2": {
+      "title": "¿Qué tipo de negocio tienes?"
+    },
+    "s3": {
+      "title": "Información práctica",
+      "hint": "El asistente se basará únicamente en estos datos. Deja en blanco lo que no desees comunicar."
+    },
+    "s4": {
+      "title": "Preguntas frecuentes y servicios",
+      "hint": "Agrega algunos elementos para comenzar. Podrás añadir más en cualquier momento.",
+      "faqTitle": "Preguntas frecuentes",
+      "faqSuggest": "Sugerencias (luego escribe tu propia respuesta):",
+      "addFaq": "Agregar pregunta",
+      "serviceTitle": "Primer servicio",
+      "addService": "Agregar",
+      "added": "Agregado:",
+      "hotelService": "Habitación",
+      "restaurantService": "Plato o bebida",
+      "otherService": "Servicio",
+      "nothingYet": "Nada agregado por el momento. También puedes hacerlo más adelante."
+    },
+    "s5": {
+      "title": "Conectar WhatsApp",
+      "hint": "Necesitarás una cuenta de WhatsApp Business (API oficial de Meta o Evolution). También puedes conectarla después desde la pestaña WhatsApp.",
+      "later": "Lo haré más tarde",
+      "connected": "WhatsApp está conectado."
+    },
+    "finish": "Finalizar",
+    "readyTitle": "Tu espacio está listo.",
+    "readyText": "Ya puedes gestionar conversaciones, ajustar tus preguntas frecuentes e invitar a tu equipo.",
+    "goDashboard": "Ir al panel de control",
+    "ownerOnly": "Solo el propietario puede configurar el espacio de trabajo."
+  },
+  "faqSuggestions": {
+    "HOTEL": [
+      "¿A qué hora es el check-in?",
+      "¿A qué hora es el check-out?",
+      "¿El desayuno está incluido?",
+      "¿Tienen estacionamiento?"
+    ],
+    "RESTAURANT": [
+      "¿Cuáles son sus horarios de atención?",
+      "¿Hacen entregas a domicilio?",
+      "¿Se puede reservar una mesa?",
+      "¿Tienen opciones vegetarianas?"
+    ],
+    "OTHER": [
+      "¿Cuáles son sus horarios de atención?",
+      "¿Dónde están ubicados?",
+      "¿Cómo puedo contactarles?"
+    ]
+  }
+}

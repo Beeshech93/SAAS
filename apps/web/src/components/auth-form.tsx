@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { api, ApiRequestError } from '@/lib/api';
 import { useAuth, type Me } from '@/lib/auth-context';
-import { t } from '@/i18n';
+import { useLocale } from '@/i18n';
+import { LanguageSwitcher } from './language-switcher';
 import { Button, ErrorAlert, Field, SelectField } from './ui';
 
 export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
   const router = useRouter();
   const { signIn } = useAuth();
+  const { t } = useLocale();
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const isRegister = mode === 'register';
@@ -45,6 +47,13 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
+      <div className="flex items-center justify-between mb-6">
+        <Link href="/" className="text-xs font-semibold text-slate-500 hover:text-slate-800 transition flex items-center gap-1">
+          <span>←</span>
+          <span>WhatsApp Business Assistant</span>
+        </Link>
+        <LanguageSwitcher theme="light" />
+      </div>
       <h1 className="text-2xl font-bold">{t(isRegister ? 'auth.registerTitle' : 'auth.loginTitle')}</h1>
       <form onSubmit={onSubmit} className="mt-8 space-y-4" noValidate={false}>
         {isRegister && (

@@ -36,7 +36,15 @@ DATABASE_URL=... npm run test:integration -w apps/api
 ```
 
 ## What's included
-Auth & sessions · multi-tenant businesses and roles (OWNER/ADMIN/AGENT) · business settings · FAQ · services (rooms/menu) · customers · inbox with AI/human handoff · WhatsApp Cloud API webhook and sending · AI assistant (Anthropic) · team invitations · analytics · plans, quotas and trial (no payments yet) · onboarding wizard · French landing page.
+Auth & sessions · multi-tenant businesses and roles (OWNER/ADMIN/AGENT) · **Super Admin Platform Console** (`/admin`) · business settings · FAQ · services (rooms/menu) · customers · inbox with AI/human handoff · WhatsApp Cloud API & Evolution API · AI assistant (Anthropic) · team invitations · analytics · plans, quotas and trial (no payments yet) · onboarding wizard · French landing page.
+
+### Super Admin Platform Console
+Promote any user to Super Admin:
+```bash
+npm run superadmin:promote -w apps/api -- <user-email>
+# or configure SUPERADMIN_EMAILS in .env (comma-separated list of emails)
+```
+Access the console at `http://localhost:3000/admin`.
 
 Docs: [API.md](API.md) · [DATABASE.md](DATABASE.md) · [ARCHITECTURE.md](ARCHITECTURE.md) · [SECURITY.md](SECURITY.md) · [DEPLOYMENT.md](DEPLOYMENT.md)
 

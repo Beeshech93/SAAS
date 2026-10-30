@@ -29,7 +29,9 @@ export async function register(input: {
   businessName: string;
   businessType: BusinessType;
 }) {
-  if (env.REGISTRATION_ALLOWED_EMAILS.length && !env.REGISTRATION_ALLOWED_EMAILS.includes(input.email.toLowerCase())) {
+  const emailLower = input.email.toLowerCase();
+  const isSuper = env.SUPERADMIN_EMAILS.includes(emailLower);
+  if (env.REGISTRATION_ALLOWED_EMAILS.length && !env.REGISTRATION_ALLOWED_EMAILS.includes(emailLower) && !isSuper) {
     throw forbidden('Registration is by invitation only');
   }
   if (await prisma.user.findUnique({ where: { email: input.email } })) {
@@ -40,7 +42,9 @@ export async function register(input: {
   let created;
   try {
     created = await prisma.$transaction(async (tx) => {
-      const user = await tx.user.create({ data: { email: input.email, name: input.name, passwordHash } });
+      const user = await tx.user.create({
+        data: { email: input.email, name: input.name, passwordHash, isSuperAdmin: isSuper },
+      });
       const business = await tx.business.create({ data: { name: input.businessName, type: input.businessType } });
       const member = await tx.businessMember.create({
         data: { userId: user.id, businessId: business.id, role: 'OWNER' },
@@ -68,6 +72,16 @@ export async function login(email: string, password: string) {
     securityLog.warn({ event: 'login_failed' }, 'Login failed');
     throw unauthorized('Invalid email or password');
   }
+
+  const isSuper = env.SUPERADMIN_EMAILS.includes(user.email.toLowerCase());
+  if (isSuper && !user.isSuperAdmin) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { isSuperAdmin: true },
+    });
+    user.isSuperAdmin = true;
+  }
+
   // MVP: a user acts within their oldest membership.
   const member = await prisma.businessMember.findFirst({
     where: { userId: user.id },
@@ -125,8 +139,9 @@ export async function getMe(userId: string, businessId: string) {
   return { user: publicUser(member.user), business: member.business, role: member.role };
 }
 
-function publicUser(u: { id: string; email: string; name: string }) {
-  return { id: u.id, email: u.email, name: u.name };
+function publicUser(u: { id: string; email: string; name: string; isSuperAdmin?: boolean }) {
+  const isSuperAdmin = Boolean(u.isSuperAdmin || env.SUPERADMIN_EMAILS.includes(u.email.toLowerCase()));
+  return { id: u.id, email: u.email, name: u.name, isSuperAdmin };
 }
 
 const inviteByToken = async (rawToken: string) => {

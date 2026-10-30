@@ -117,12 +117,14 @@ model User {
   email        String   @unique
   passwordHash String
   name         String
+  isSuperAdmin Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   memberships           BusinessMember[]
   refreshTokens         RefreshToken[]
   assignedConversations Conversation[]
+  auditLogs             AuditLog[]
 }
 
 model Business {
@@ -479,4 +481,25 @@ model CustomerListMember {
 
   @@id([listId, customerId])
   @@index([customerId])
+}
+
+// Tamper-evident audit trail for every action performed by a Super Admin.
+model AuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  actorId     String   @db.Uuid          // User who performed the action
+  action      String                      // e.g. "business.status_updated", "user.superadmin_toggled"
+  targetType  String                      // e.g. "Business", "User", "Subscription"
+  targetId    String?  @db.Uuid          // ID of the affected entity
+  description String                      // Human-readable description of the event
+  metadata    Json?                       // Arbitrary payload: before/after values, extra context
+  ipAddress   String?                     // IP address of the request
+  userAgent   String?                     // User-Agent header
+  createdAt   DateTime @default(now())
+
+  actor User @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([actorId])
+  @@index([action])
+  @@index([targetType, targetId])
+  @@index([createdAt])
 }

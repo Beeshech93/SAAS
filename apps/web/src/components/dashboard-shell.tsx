@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { t } from '@/i18n';
+import { useLocale } from '@/i18n';
+import { LanguageSwitcher } from './language-switcher';
 import { Button, Spinner } from './ui';
 
 const NAV: { key: string; href?: string }[] = [
@@ -25,6 +26,7 @@ const NAV: { key: string; href?: string }[] = [
 
 export function DashboardShell({ children }: { children: ReactNode }) {
   const { me, loading, signOut } = useAuth();
+  const { t } = useLocale();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -41,10 +43,29 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
       <aside className="border-b border-slate-200 bg-white md:w-60 md:border-b-0 md:border-r">
-        <div className="px-4 py-4">
-          <p className="truncate font-semibold">{me.business.name}</p>
-          <p className="truncate text-xs text-slate-500">{me.user.email} · {t(`dashboard.role.${me.role}`)}</p>
+        <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+          <div className="min-w-0 pr-2">
+            <p className="truncate font-semibold text-sm">{me.business.name}</p>
+            <p className="truncate text-xs text-slate-500">{me.user.email} · {t(`dashboard.role.${me.role}`)}</p>
+          </div>
+          <LanguageSwitcher compact theme="light" />
         </div>
+        {me.user.isSuperAdmin && (
+          <div className="mb-2 px-2">
+            <Link
+              href="/admin"
+              className="flex items-center justify-between rounded-lg bg-gradient-to-r from-slate-900 to-indigo-950 px-3 py-2 text-xs font-semibold text-amber-300 shadow-sm border border-amber-400/30 hover:border-amber-400/70 transition group"
+            >
+              <span className="flex items-center gap-1.5">
+                <span>👑</span>
+                <span>Console Super Admin</span>
+              </span>
+              <span className="text-[10px] bg-amber-400/20 text-amber-300 px-1.5 py-0.5 rounded font-mono">
+                SaaS
+              </span>
+            </Link>
+          </div>
+        )}
         <nav aria-label="Navigation principale" className="flex gap-1 overflow-x-auto px-2 pb-2 md:flex-col md:overflow-visible">
           {NAV.map((item) =>
             item.href ? (

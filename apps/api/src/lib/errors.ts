@@ -24,3 +24,4 @@ export const unauthorized = (msg = 'Authentication required') => new AppError(40
 export const forbidden = (msg = 'Insufficient permissions') => new AppError(403, 'FORBIDDEN', msg);
 export const notFound = (msg = 'Resource not found') => new AppError(404, 'NOT_FOUND', msg);
 export const conflict = (msg: string) => new AppError(409, 'CONFLICT', msg);
+export const badRequest = (msg: string, details?: unknown) => new AppError(400, 'VALIDATION_ERROR', msg, details);

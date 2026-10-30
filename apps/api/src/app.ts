@@ -22,6 +22,7 @@ import { automationRouter } from './modules/automation/automation.routes';
 import { campaignsRouter } from './modules/campaigns/campaigns.routes';
 import { listsRouter } from './modules/lists/lists.routes';
 import { servicesRouter } from './modules/services/services.routes';
+import { adminRouter } from './modules/admin/admin.routes';
 
 export function createApp() {
   const app = express();
@@ -67,6 +68,7 @@ export function createApp() {
   app.use('/api/team', teamRouter);
   app.use('/api/plans', plansRouter);
   app.use('/api/subscription', subscriptionRouter);
+  app.use('/api/admin', adminRouter);
   app.use('/api/webhooks/whatsapp', whatsappWebhookRouter);
   app.use('/webhooks/whatsapp', whatsappWebhookRouter);
   app.use('/api/webhooks/evolution', evolutionWebhookRouter);

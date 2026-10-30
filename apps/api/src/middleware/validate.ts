@@ -13,3 +13,14 @@ export const validateBody =
     req.body = result.data;
     next();
   };
+
+export const validateQuery =
+  (schema: ZodSchema): RequestHandler =>
+  (req, _res, next) => {
+    const result = schema.safeParse(req.query);
+    if (!result.success) {
+      return next(new AppError(400, 'VALIDATION_ERROR', 'Invalid query parameters', result.error.flatten().fieldErrors));
+    }
+    req.query = result.data;
+    next();
+  };
