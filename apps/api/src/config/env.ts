@@ -19,6 +19,9 @@ const schema = z.object({
   WHATSAPP_APP_SECRET: optional(z.string().min(8)),
   WHATSAPP_GRAPH_URL: z.string().url().default('https://graph.facebook.com'),
   WHATSAPP_API_VERSION: z.string().regex(/^v\d+\.\d+$/).default('v21.0'),
+  // Platform-wide Evolution API server for all tenant businesses.
+  EVOLUTION_SERVER_URL: optional(z.string().url()),
+  EVOLUTION_API_KEY: optional(z.string().min(8)),
   // 32 random bytes, base64 (openssl rand -base64 32). Encrypts per-business WhatsApp tokens.
   ENCRYPTION_KEY: optional(
     z.string().refine((v) => Buffer.from(v, 'base64').length === 32, 'ENCRYPTION_KEY must be 32 bytes, base64-encoded'),

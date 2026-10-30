@@ -1,7 +1,9 @@
 {
   "name": "whatsapp-business-assistant",
   "private": true,
-  "workspaces": ["apps/*"],
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
     "dev:api": "npm run dev -w apps/api",
     "dev:web": "npm run dev -w apps/web",
@@ -9,5 +11,8 @@
     "test": "npm test -w apps/api",
     "db:generate": "npm run prisma:generate -w apps/api",
     "db:migrate": "npm run prisma:migrate -w apps/api"
+  },
+  "optionalDependencies": {
+    "@next/swc-darwin-arm64": "^16.3.8"
   }
 }

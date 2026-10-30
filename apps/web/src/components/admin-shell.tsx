@@ -19,6 +19,7 @@ const ADMIN_NAV: NavItem[] = [
   { key: 'businesses', label: 'Entreprises (Tenants)', href: '/admin/businesses', icon: '🏢' },
   { key: 'users', label: 'Utilisateurs', href: '/admin/users', icon: '👥' },
   { key: 'whatsapp', label: 'WhatsApp & Systèmes', href: '/admin/whatsapp', icon: '💬' },
+  { key: 'evolution', label: 'Evolution API', href: '/admin/evolution', icon: '📲' },
   { key: 'subscriptions', label: 'Plans & Abonnements', href: '/admin/subscriptions', icon: '💳' },
   { key: 'logs', label: "Journal d'Audit", href: '/admin/logs', icon: '📋' },
 ];

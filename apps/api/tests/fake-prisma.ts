@@ -198,6 +198,7 @@ export function createFakePrisma() {
   };
 
   const auditLog = table();
+  const systemSetting = table();
 
   const fake: Row = {
     user: enhancedUser,
@@ -220,6 +221,7 @@ export function createFakePrisma() {
     conversation,
     message,
     auditLog,
+    systemSetting,
     $transaction: async (fn: (tx: Row) => Promise<unknown>) => fn(fake),
   };
   return fake;

@@ -4,6 +4,7 @@ import { parseId } from '../../lib/crud';
 import { authenticate, requireSuperAdmin } from '../../middleware/auth';
 import { validateBody, validateQuery } from '../../middleware/validate';
 import * as adminService from './admin.service';
+import * as evolutionAdminService from './evolution-admin.service';
 
 export const adminRouter = Router();
 
@@ -152,3 +153,71 @@ adminRouter.get('/audit-logs', validateQuery(listAuditLogsQuery), async (req, re
     next(err);
   }
 });
+
+// ─── Evolution API Global Management ─────────────────────────────────────────
+
+adminRouter.get('/evolution', async (_req, res, next) => {
+  try {
+    const data = await evolutionAdminService.getGlobalEvolutionConfig();
+    res.json({
+      success: true,
+      data: {
+        serverUrl: data.serverUrl,
+        hasApiKey: data.hasApiKey,
+        isConfigured: data.isConfigured,
+        source: data.source,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+const saveEvolutionSchema = z.object({
+  serverUrl: z.string().trim().url(),
+  apiKey: z.string().trim().min(8).optional(),
+});
+
+adminRouter.put('/evolution', validateBody(saveEvolutionSchema), async (req, res, next) => {
+  try {
+    const data = await evolutionAdminService.saveGlobalEvolutionConfig({
+      serverUrl: req.body.serverUrl,
+      apiKey: req.body.apiKey,
+      actorId: req.auth!.userId,
+    });
+    res.json({
+      success: true,
+      data: {
+        serverUrl: data.serverUrl,
+        hasApiKey: data.hasApiKey,
+        isConfigured: data.isConfigured,
+        source: data.source,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+const testEvolutionSchema = z.object({
+  serverUrl: z.string().trim().url(),
+  apiKey: z.string().trim().min(8).optional(),
+});
+
+adminRouter.post('/evolution/test', validateBody(testEvolutionSchema), async (req, res, next) => {
+  try {
+    let key = req.body.apiKey;
+    if (!key) {
+      const cfg = await evolutionAdminService.getGlobalEvolutionConfig();
+      key = cfg.apiKey;
+    }
+    if (!key) {
+      return res.status(400).json({ success: false, error: 'Clé API manquante pour tester la connexion' });
+    }
+    const result = await evolutionAdminService.testEvolutionConnection(req.body.serverUrl, key);
+    res.json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
+});
+

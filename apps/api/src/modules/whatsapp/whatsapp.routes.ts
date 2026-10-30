@@ -10,6 +10,7 @@ import { assertSafeServerUrl } from '../../lib/url-guard';
 import { EvolutionApiProvider, WhatsAppProviderError } from '../../integrations/whatsapp/provider';
 import { authenticate, requireRole } from '../../middleware/auth';
 import { validateBody } from '../../middleware/validate';
+import { getGlobalEvolutionConfig } from '../admin/evolution-admin.service';
 
 const status = z.enum(['ACTIVE', 'DISABLED']).default('ACTIVE');
 const displayPhoneNumber = z.string().trim().max(30).nullable().optional();
@@ -27,8 +28,9 @@ const cloudSchema = z
 const evolutionSchema = z
   .object({
     provider: z.literal('EVOLUTION'),
-    baseUrl: z.string().trim().url().max(300),
-    instanceName: z.string().trim().regex(/^[\w.-]{1,100}$/, 'Letters, digits, . _ - only'),
+    usePlatformEvolution: z.boolean().optional().default(false),
+    baseUrl: z.string().trim().url().max(300).optional(),
+    instanceName: z.string().trim().regex(/^[\w.-]{1,100}$/, 'Letters, digits, . _ - only').optional(),
     // Optional when re-saving an existing Evolution connection (the stored key is kept).
     apiKey: z.string().trim().min(8).max(500).optional(),
     // Create the instance on the server first (apiKey is then the server's global key).
@@ -63,8 +65,14 @@ const appUrl = () => env.APP_URL.replace(/\/$/, '');
 const evolutionWebhookUrl = (i: Pick<Row, 'id' | 'webhookSecret'>) => `${appUrl()}/api/webhooks/evolution/${i.id}/${i.webhookSecret}`;
 
 /** Never returns tokens/keys. The Evolution webhook URL embeds a secret, so only owners get it. */
-const view = (i: Row | null, extra: { webhookRegistered?: boolean; connectionState?: string } = {}, owner = false) => ({
+const view = (
+  i: Row | null,
+  extra: { webhookRegistered?: boolean; connectionState?: string } = {},
+  owner = false,
+  platformEvolutionConfigured = false,
+) => ({
   connected: !!i,
+  platformEvolutionConfigured,
   integration: i && {
     provider: i.provider,
     phoneNumberId: i.phoneNumberId,
@@ -81,8 +89,11 @@ const view = (i: Row | null, extra: { webhookRegistered?: boolean; connectionSta
 
 whatsappRouter.get('/', requireRole('OWNER', 'ADMIN'), async (req, res, next) => {
   try {
-    const i = await prisma.whatsAppIntegration.findFirst({ where: { businessId: req.auth!.businessId } });
-    res.json({ success: true, data: view(i, {}, req.auth!.role === 'OWNER') });
+    const [i, globalEvo] = await Promise.all([
+      prisma.whatsAppIntegration.findFirst({ where: { businessId: req.auth!.businessId } }),
+      getGlobalEvolutionConfig(),
+    ]);
+    res.json({ success: true, data: view(i, {}, req.auth!.role === 'OWNER', globalEvo.isConfigured) });
   } catch (e) {
     next(e);
   }
@@ -110,19 +121,43 @@ whatsappRouter.put('/', requireRole('OWNER'), validateBody(upsertSchema), async 
       };
     } else {
       let baseUrl: string;
-      try {
-        baseUrl = assertSafeServerUrl(body.baseUrl);
-      } catch (e) {
-        throw new AppError(400, 'VALIDATION_ERROR', 'Invalid request', { baseUrl: [(e as Error).message] });
-      }
+      let apiKey: string | undefined;
+      let instanceName: string | undefined = body.instanceName;
       const keeping = existing?.provider === 'EVOLUTION';
-      const apiKey = body.apiKey ?? (keeping ? decrypt(existing!.accessTokenEnc) : undefined);
+
+      if (body.usePlatformEvolution) {
+        // Resolve baseUrl and apiKey from the global platform config.
+        const globalCfg = await getGlobalEvolutionConfig();
+        if (!globalCfg.isConfigured || !globalCfg.serverUrl || !globalCfg.apiKey) {
+          throw new AppError(400, 'VALIDATION_ERROR', 'Invalid request', {
+            usePlatformEvolution: ['Platform Evolution API is not configured by the administrator'],
+          });
+        }
+        baseUrl = globalCfg.serverUrl;
+        apiKey = globalCfg.apiKey;
+        // Auto-generate a unique instance name from the business ID when not provided.
+        if (!instanceName) {
+          instanceName = `biz-${businessId.replace(/-/g, '').slice(0, 16)}`;
+        }
+      } else {
+        if (!body.baseUrl) throw new AppError(400, 'VALIDATION_ERROR', 'Invalid request', { baseUrl: ['Required'] });
+        if (!instanceName) throw new AppError(400, 'VALIDATION_ERROR', 'Invalid request', { instanceName: ['Required'] });
+        try {
+          baseUrl = assertSafeServerUrl(body.baseUrl);
+        } catch (e) {
+          throw new AppError(400, 'VALIDATION_ERROR', 'Invalid request', { baseUrl: [(e as Error).message] });
+        }
+        apiKey = body.apiKey ?? (keeping ? decrypt(existing!.accessTokenEnc) : undefined);
+      }
+
       if (!apiKey) throw new AppError(400, 'VALIDATION_ERROR', 'Invalid request', { apiKey: ['Required'] });
 
       let apiKeyToStore = apiKey;
-      if (body.createInstance) {
+      // Always auto-create the instance when using the platform server so the tenant doesn't need to set it up.
+      const shouldCreateInstance = body.createInstance || (body.usePlatformEvolution && !keeping);
+      if (shouldCreateInstance) {
         try {
-          const created = await new EvolutionApiProvider({ baseUrl, instanceName: body.instanceName, apiKey }).createInstance();
+          const created = await new EvolutionApiProvider({ baseUrl, instanceName, apiKey }).createInstance();
           if (created.instanceApiKey) apiKeyToStore = created.instanceApiKey; // keep only the narrower per-instance key
         } catch (err) {
           const message = err instanceof WhatsAppProviderError ? err.message : 'unknown error';
@@ -133,7 +168,7 @@ whatsappRouter.put('/', requireRole('OWNER'), validateBody(upsertSchema), async 
       // A key not yet in the database can never receive traffic, so the secret exists before the URL is shown.
       const webhookSecret = (keeping && existing!.webhookSecret) || crypto.randomBytes(24).toString('base64url');
       const host = new URL(baseUrl).host;
-      const phoneNumberId = `evo:${body.instanceName}@${host}`;
+      const phoneNumberId = `evo:${instanceName}@${host}`;
       data = {
         provider: 'EVOLUTION',
         phoneNumberId,
@@ -141,7 +176,7 @@ whatsappRouter.put('/', requireRole('OWNER'), validateBody(upsertSchema), async 
         accessTokenEnc: encrypt(apiKeyToStore),
         status: body.status,
         baseUrl,
-        instanceName: body.instanceName,
+        instanceName,
         webhookSecret,
       };
     }

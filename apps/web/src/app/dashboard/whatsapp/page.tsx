@@ -9,6 +9,7 @@ import { t } from '@/i18n';
 
 interface State {
   connected: boolean;
+  platformEvolutionConfigured: boolean;
   integration: { provider: 'CLOUD_API' | 'EVOLUTION'; phoneNumberId: string; displayPhoneNumber: string | null; status: 'ACTIVE' | 'DISABLED'; baseUrl: string | null; instanceName: string | null } | null;
   webhookUrl: string | null;
   webhookConfigured: boolean;
@@ -22,6 +23,7 @@ export default function WhatsAppPage() {
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [usePlatform, setUsePlatform] = useState(true);
   const isOwner = me?.role === 'OWNER';
   const [provider, setProvider] = useState<'CLOUD_API' | 'EVOLUTION' | null>(null);
 
@@ -38,11 +40,19 @@ export default function WhatsAppPage() {
     const str = (k: string) => String(f.get(k) ?? '').trim();
     const common = { displayPhoneNumber: str('displayPhoneNumber') || null, status: f.get('enabled') === 'on' ? 'ACTIVE' : 'DISABLED' };
     const body = activeProvider === 'EVOLUTION'
-      ? { provider: 'EVOLUTION', baseUrl: str('baseUrl'), instanceName: str('instanceName'), ...(str('apiKey') ? { apiKey: str('apiKey') } : {}), createInstance: f.get('createInstance') === 'on', ...common }
+      ? (state?.platformEvolutionConfigured && usePlatform
+          ? { provider: 'EVOLUTION', usePlatformEvolution: true, ...common }
+          : { provider: 'EVOLUTION', baseUrl: str('baseUrl'), instanceName: str('instanceName'), ...(str('apiKey') ? { apiKey: str('apiKey') } : {}), createInstance: f.get('createInstance') === 'on', ...common })
       : { provider: 'CLOUD_API', phoneNumberId: str('phoneNumberId'), accessToken: str('accessToken'), ...common };
     setBusy(true); setError(null); setSaved(false);
-    try { setState(await api<State>('/api/whatsapp', { method: 'PUT', body })); setSaved(true); form.querySelectorAll<HTMLInputElement>('input[type=password]').forEach((x) => { x.value = ''; }); form.querySelectorAll<HTMLInputElement>('input[name=createInstance]').forEach((x) => { x.checked = false; }); }
-    catch (err) { setError(errorMessage(err)); }
+    try {
+      setState(await api<State>('/api/whatsapp', { method: 'PUT', body }));
+      setSaved(true);
+      form.querySelectorAll<HTMLInputElement>('input[type=password]').forEach((x) => { x.value = ''; });
+      form.querySelectorAll<HTMLInputElement>('input[name=createInstance]').forEach((x) => { x.checked = false; });
+    } catch (err) {
+      setError(errorMessage(err));
+    }
     setBusy(false);
   }
 
@@ -54,7 +64,7 @@ export default function WhatsAppPage() {
 
   if (!state) return error ? <ErrorAlert message={error} /> : <Spinner label={t('common.loading')} />;
   const i = state.integration;
-  const activeProvider = provider ?? i?.provider ?? 'CLOUD_API';
+  const activeProvider = provider ?? i?.provider ?? (state.platformEvolutionConfigured ? 'EVOLUTION' : 'CLOUD_API');
   const evo = activeProvider === 'EVOLUTION';
   const label = !i ? t('whatsapp.notConnected') : i.status === 'ACTIVE' ? t('whatsapp.connected') : t('whatsapp.disabled');
 
@@ -90,20 +100,65 @@ export default function WhatsAppPage() {
       {isOwner && (
         <form onSubmit={onSubmit} className="mt-4 space-y-4 rounded-xl border border-slate-200 bg-white p-5">
           <SelectField id="provider" label={t('whatsapp.provider')} value={activeProvider} onChange={(e) => setProvider(e.target.value as 'CLOUD_API' | 'EVOLUTION')} disabled={busy}>
-            <option value="CLOUD_API">{t('whatsapp.providerCloud')}</option>
             <option value="EVOLUTION">{t('whatsapp.providerEvolution')}</option>
+            <option value="CLOUD_API">{t('whatsapp.providerCloud')}</option>
           </SelectField>
           {evo ? (
-            <>
-              <Field id="baseUrl" name="baseUrl" type="url" label={t('whatsapp.evoBaseUrl')} hint={t('whatsapp.evoBaseUrlHint')} required defaultValue={i?.baseUrl ?? ''} disabled={busy} />
-              <Field id="instanceName" name="instanceName" label={t('whatsapp.evoInstance')} required pattern="[\w.\-]{1,100}" defaultValue={i?.instanceName ?? ''} disabled={busy} />
-              <Field id="apiKey" name="apiKey" type="password" label={t('whatsapp.evoApiKey')} hint={t('whatsapp.evoApiKeyKeep')} required={i?.provider !== 'EVOLUTION'} minLength={8} autoComplete="off" disabled={busy} />
-              <div>
-                <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="createInstance" disabled={busy} /> {t('whatsapp.evoCreate')}</label>
-                <p className="mt-1 text-xs text-slate-500">{t('whatsapp.evoCreateHint')}</p>
+            state.platformEvolutionConfigured ? (
+              <div className="space-y-4">
+                <div className="rounded-xl border border-purple-200 bg-gradient-to-r from-purple-50 to-indigo-50 p-4">
+                  <label className="flex items-center gap-2.5 text-sm font-semibold text-purple-950 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={usePlatform}
+                      onChange={(e) => setUsePlatform(e.target.checked)}
+                      disabled={busy}
+                      className="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+                    />
+                    <span>📲 {t('whatsapp.usePlatformEvo')}</span>
+                  </label>
+                  <p className="mt-1.5 pl-6.5 text-xs text-purple-800 leading-relaxed">
+                    {usePlatform ? t('whatsapp.platformEvoNotice') : t('whatsapp.useCustomEvo')}
+                  </p>
+                </div>
+
+                {usePlatform ? (
+                  <Field
+                    id="displayPhoneNumber"
+                    name="displayPhoneNumber"
+                    label={t('whatsapp.displayPhone')}
+                    maxLength={30}
+                    defaultValue={i?.displayPhoneNumber ?? ''}
+                    disabled={busy}
+                  />
+                ) : (
+                  <>
+                    <Field id="baseUrl" name="baseUrl" type="url" label={t('whatsapp.evoBaseUrl')} hint={t('whatsapp.evoBaseUrlHint')} required defaultValue={i?.baseUrl ?? ''} disabled={busy} />
+                    <Field id="instanceName" name="instanceName" label={t('whatsapp.evoInstance')} required pattern="[\w.\-]{1,100}" defaultValue={i?.instanceName ?? ''} disabled={busy} />
+                    <Field id="apiKey" name="apiKey" type="password" label={t('whatsapp.evoApiKey')} hint={t('whatsapp.evoApiKeyKeep')} required={i?.provider !== 'EVOLUTION'} minLength={8} autoComplete="off" disabled={busy} />
+                    <div>
+                      <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="createInstance" disabled={busy} /> {t('whatsapp.evoCreate')}</label>
+                      <p className="mt-1 text-xs text-slate-500">{t('whatsapp.evoCreateHint')}</p>
+                    </div>
+                    <Field id="displayPhoneNumber" name="displayPhoneNumber" label={t('whatsapp.displayPhone')} maxLength={30} defaultValue={i?.displayPhoneNumber ?? ''} disabled={busy} />
+                  </>
+                )}
               </div>
-              <Field id="displayPhoneNumber" name="displayPhoneNumber" label={t('whatsapp.displayPhone')} maxLength={30} defaultValue={i?.displayPhoneNumber ?? ''} disabled={busy} />
-            </>
+            ) : (
+              <>
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+                  {t('whatsapp.platformEvoNotReady')}
+                </div>
+                <Field id="baseUrl" name="baseUrl" type="url" label={t('whatsapp.evoBaseUrl')} hint={t('whatsapp.evoBaseUrlHint')} required defaultValue={i?.baseUrl ?? ''} disabled={busy} />
+                <Field id="instanceName" name="instanceName" label={t('whatsapp.evoInstance')} required pattern="[\w.\-]{1,100}" defaultValue={i?.instanceName ?? ''} disabled={busy} />
+                <Field id="apiKey" name="apiKey" type="password" label={t('whatsapp.evoApiKey')} hint={t('whatsapp.evoApiKeyKeep')} required={i?.provider !== 'EVOLUTION'} minLength={8} autoComplete="off" disabled={busy} />
+                <div>
+                  <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="createInstance" disabled={busy} /> {t('whatsapp.evoCreate')}</label>
+                  <p className="mt-1 text-xs text-slate-500">{t('whatsapp.evoCreateHint')}</p>
+                </div>
+                <Field id="displayPhoneNumber" name="displayPhoneNumber" label={t('whatsapp.displayPhone')} maxLength={30} defaultValue={i?.displayPhoneNumber ?? ''} disabled={busy} />
+              </>
+            )
           ) : (
             <>
               <Field id="phoneNumberId" name="phoneNumberId" label={t('whatsapp.phoneNumberId')} required pattern="\d{5,30}" inputMode="numeric" defaultValue={i?.provider === 'CLOUD_API' ? i.phoneNumberId : ''} disabled={busy} />

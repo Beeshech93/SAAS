@@ -503,3 +503,11 @@ model AuditLog {
   @@index([targetType, targetId])
   @@index([createdAt])
 }
+
+// Global platform configuration settings (e.g. platform-wide Evolution API server).
+model SystemSetting {
+  key       String   @id
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
