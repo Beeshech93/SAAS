@@ -112,6 +112,13 @@ enum MemberRole {
   AGENT
 }
 
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  UNQUALIFIED
+}
+
 model User {
   id           String   @id @default(uuid()) @db.Uuid
   email        String   @unique
@@ -510,4 +517,33 @@ model SystemSetting {
   value     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// B2B Leads and potential business emails found for campaigns and outreach
+model Lead {
+  id           String      @id @default(uuid()) @db.Uuid
+  name         String
+  category     String?
+  email        String?
+  otherEmails  String[]    @default([])
+  phone        String?
+  website      String?
+  address      String?
+  city         String?
+  country      String?
+  source       String?     @default("google_maps")
+  status       LeadStatus  @default(NEW)
+  rating       Float?
+  reviewsCount Int?
+  notes        String?
+  socialLinks  Json?
+  metadata     Json?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([email])
+  @@index([city])
+  @@index([category])
+  @@index([status])
+  @@index([createdAt])
 }

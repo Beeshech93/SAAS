@@ -5,11 +5,15 @@ import { authenticate, requireSuperAdmin } from '../../middleware/auth';
 import { validateBody, validateQuery } from '../../middleware/validate';
 import * as adminService from './admin.service';
 import * as evolutionAdminService from './evolution-admin.service';
+import { leadFinderRouter } from '../lead-finder/lead-finder.routes';
 
 export const adminRouter = Router();
 
 // All routes require authentication and Super Admin privileges
 adminRouter.use(authenticate, requireSuperAdmin);
+
+// Lead Finder & Prospecting engine
+adminRouter.use('/leads', leadFinderRouter);
 
 adminRouter.get('/overview', async (_req, res, next) => {
   try {

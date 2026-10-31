@@ -18,6 +18,7 @@ const ADMIN_NAV: NavItem[] = [
   { key: 'overview', label: "Vue d'ensemble", href: '/admin', icon: '📊' },
   { key: 'businesses', label: 'Entreprises (Tenants)', href: '/admin/businesses', icon: '🏢' },
   { key: 'users', label: 'Utilisateurs', href: '/admin/users', icon: '👥' },
+  { key: 'leads', label: 'Prospects & Emails (Leads)', href: '/admin/leads', icon: '🎯' },
   { key: 'whatsapp', label: 'WhatsApp & Systèmes', href: '/admin/whatsapp', icon: '💬' },
   { key: 'evolution', label: 'Evolution API', href: '/admin/evolution', icon: '📲' },
   { key: 'subscriptions', label: 'Plans & Abonnements', href: '/admin/subscriptions', icon: '💳' },

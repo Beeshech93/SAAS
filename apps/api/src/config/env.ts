@@ -46,6 +46,8 @@ const schema = z.object({
   // Campaign sending: recipients per request and the pause between messages (anti-ban, serverless-friendly).
   CAMPAIGN_BATCH_SIZE: z.coerce.number().int().min(1).max(50).default(10),
   CAMPAIGN_SEND_DELAY_MS: z.coerce.number().int().min(0).max(10_000).default(1000),
+  // Google Places API (for Admin Lead & Business finder). Optional: fallback to free sources if empty.
+  GOOGLE_PLACES_API_KEY: optional(z.string().min(10)),
   // AI (Anthropic Messages API). Without AI_API_KEY the assistant is simply off.
   AI_API_KEY: optional(z.string().min(10)),
   AI_MODEL: z.string().default('claude-sonnet-5-5'),
